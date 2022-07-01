@@ -79,9 +79,9 @@ data = dict(
     workers_per_gpu=12,
     train=dict(
         type='ADE20KDataset',
-        data_root='./SegCombined/Images',
-        img_dir='img_dir/train',
-        ann_dir='ann_dir/train',
+        data_root='./FoodSeg103/Images',
+        img_dir='img_dir_edited/train',
+        ann_dir='ann_dir_edited/train',
         pipeline=[
             dict(type='LoadImageFromFile'),
             dict(type='LoadAnnotations', reduce_zero_label=False),
@@ -100,9 +100,9 @@ data = dict(
         ]),
     val=dict(
         type='ADE20KDataset',
-        data_root='./SegCombined/Images',
-        img_dir='img_dir/test',
-        ann_dir='ann_dir/test',
+        data_root='./FoodSeg103/Images',
+        img_dir='img_dir_edited/test',
+        ann_dir='ann_dir_edited/test',
         pipeline=[
             dict(type='LoadImageFromFile'),
             dict(
@@ -123,9 +123,9 @@ data = dict(
         ]),
     test=dict(
         type='ADE20KDataset',
-        data_root='./SegCombined/Images',
-        img_dir='img_dir/test',
-        ann_dir='ann_dir/test',
+        data_root='./FoodSeg103/Images',
+        img_dir='img_dir_edited/test',
+        ann_dir='ann_dir_edited/test',
         pipeline=[
             dict(type='LoadImageFromFile'),
             dict(
@@ -149,7 +149,7 @@ log_config = dict(
 dist_params = dict(backend='nccl')
 log_level = 'INFO'
 load_from = None
-resume_from = './work_dirs/deeplabv3plus_mobilenet_multi_combined_80k/latest.pth'
+resume_from = './work_dirs/deeplabv3plus_mobilenet_foodseg103_multi_80k/latest.pth'
 workflow = [('train', 1)]
 cudnn_benchmark = True
 optimizer = dict(type='SGD', lr=0.01, momentum=0.9, weight_decay=0.0005)

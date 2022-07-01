@@ -1,6 +1,6 @@
 norm_cfg = dict(type='SyncBN', requires_grad=True)
 model = dict(
-    type='MultiEncoderDecoder',
+    type='EncoderDecoder',
     pretrained='open-mmlab://contrib/mobilenet_v3_large',
     backbone=dict(
         type='MobileNetV3',
@@ -8,7 +8,7 @@ model = dict(
         out_indices=(1, 3, 16),
         norm_cfg=dict(type='SyncBN', eps=0.001, requires_grad=True)),
     decode_head=dict(
-        type='MultiDepthwiseSeparableASPPHead',
+        type='DepthwiseSeparableASPPHead',
         in_channels=960,
         in_index=2,
         channels=128,
@@ -19,7 +19,8 @@ model = dict(
         num_classes=11,
         norm_cfg=dict(type='SyncBN', requires_grad=True),
         align_corners=False,
-        loss_decode=dict(type='CombinedCrossEntropyLoss', loss_weight=1.0)),
+        loss_decode=dict(
+            type='CrossEntropyLoss', use_sigmoid=False, loss_weight=1.0)),
     auxiliary_head=dict(
         type='FCNHead',
         in_channels=960,
@@ -149,7 +150,7 @@ log_config = dict(
 dist_params = dict(backend='nccl')
 log_level = 'INFO'
 load_from = None
-resume_from = './work_dirs/deeplabv3plus_mobilenet_multi_combined_80k/latest.pth'
+resume_from = None
 workflow = [('train', 1)]
 cudnn_benchmark = True
 optimizer = dict(type='SGD', lr=0.01, momentum=0.9, weight_decay=0.0005)
