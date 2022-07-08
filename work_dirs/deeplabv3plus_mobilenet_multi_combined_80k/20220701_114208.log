@@ -1,0 +1,1731 @@
+2022-07-01 11:42:08,590 - mmseg - INFO - Multi-processing start method is `None`
+2022-07-01 11:42:08,590 - mmseg - INFO - OpenCV num_threads is `<built-in function getNumThreads>
+2022-07-01 11:42:08,591 - mmseg - INFO - OMP num threads is 1
+2022-07-01 11:42:08,655 - mmseg - INFO - Environment info:
+------------------------------------------------------------
+sys.platform: linux
+Python: 3.8.13 (default, Mar 28 2022, 11:38:47) [GCC 7.5.0]
+CUDA available: True
+GPU 0: NVIDIA TITAN V
+GPU 1: Quadro P6000
+GPU 2,3: NVIDIA TITAN X (Pascal)
+CUDA_HOME: /usr/local/cuda
+NVCC: Cuda compilation tools, release 11.7, V11.7.64
+GCC: gcc (Ubuntu 9.4.0-1ubuntu1~20.04.1) 9.4.0
+PyTorch: 1.10.0
+PyTorch compiling details: PyTorch built with:
+  - GCC 7.3
+  - C++ Version: 201402
+  - Intel(R) oneAPI Math Kernel Library Version 2021.4-Product Build 20210904 for Intel(R) 64 architecture applications
+  - Intel(R) MKL-DNN v2.2.3 (Git Hash 7336ca9f055cf1bfa13efb658fe15dc9b41f0740)
+  - OpenMP 201511 (a.k.a. OpenMP 4.5)
+  - LAPACK is enabled (usually provided by MKL)
+  - NNPACK is enabled
+  - CPU capability usage: AVX2
+  - CUDA Runtime 11.3
+  - NVCC architecture flags: -gencode;arch=compute_37,code=sm_37;-gencode;arch=compute_50,code=sm_50;-gencode;arch=compute_60,code=sm_60;-gencode;arch=compute_61,code=sm_61;-gencode;arch=compute_70,code=sm_70;-gencode;arch=compute_75,code=sm_75;-gencode;arch=compute_80,code=sm_80;-gencode;arch=compute_86,code=sm_86;-gencode;arch=compute_37,code=compute_37
+  - CuDNN 8.2
+  - Magma 2.5.2
+  - Build settings: BLAS_INFO=mkl, BUILD_TYPE=Release, CUDA_VERSION=11.3, CUDNN_VERSION=8.2.0, CXX_COMPILER=/opt/rh/devtoolset-7/root/usr/bin/c++, CXX_FLAGS= -Wno-deprecated -fvisibility-inlines-hidden -DUSE_PTHREADPOOL -fopenmp -DNDEBUG -DUSE_KINETO -DUSE_FBGEMM -DUSE_QNNPACK -DUSE_PYTORCH_QNNPACK -DUSE_XNNPACK -DSYMBOLICATE_MOBILE_DEBUG_HANDLE -DEDGE_PROFILER_USE_KINETO -O2 -fPIC -Wno-narrowing -Wall -Wextra -Werror=return-type -Wno-missing-field-initializers -Wno-type-limits -Wno-array-bounds -Wno-unknown-pragmas -Wno-sign-compare -Wno-unused-parameter -Wno-unused-variable -Wno-unused-function -Wno-unused-result -Wno-unused-local-typedefs -Wno-strict-overflow -Wno-strict-aliasing -Wno-error=deprecated-declarations -Wno-stringop-overflow -Wno-psabi -Wno-error=pedantic -Wno-error=redundant-decls -Wno-error=old-style-cast -fdiagnostics-color=always -faligned-new -Wno-unused-but-set-variable -Wno-maybe-uninitialized -fno-math-errno -fno-trapping-math -Werror=format -Wno-stringop-overflow, LAPACK_INFO=mkl, PERF_WITH_AVX=1, PERF_WITH_AVX2=1, PERF_WITH_AVX512=1, TORCH_VERSION=1.10.0, USE_CUDA=ON, USE_CUDNN=ON, USE_EXCEPTION_PTR=1, USE_GFLAGS=OFF, USE_GLOG=OFF, USE_MKL=ON, USE_MKLDNN=ON, USE_MPI=OFF, USE_NCCL=ON, USE_NNPACK=ON, USE_OPENMP=ON, 
+
+TorchVision: 0.11.0
+OpenCV: 4.6.0
+MMCV: 1.5.3
+MMCV Compiler: GCC 7.3
+MMCV CUDA Compiler: 11.3
+MMSegmentation: 0.25.0+8825083
+------------------------------------------------------------
+
+2022-07-01 11:42:08,655 - mmseg - INFO - Distributed training: True
+2022-07-01 11:42:08,947 - mmseg - INFO - Config:
+norm_cfg = dict(type='SyncBN', requires_grad=True)
+model = dict(
+    type='MultiEncoderDecoder',
+    pretrained='open-mmlab://contrib/mobilenet_v3_large',
+    backbone=dict(
+        type='MobileNetV3',
+        arch='large',
+        out_indices=(1, 3, 16),
+        norm_cfg=dict(type='SyncBN', eps=0.001, requires_grad=True)),
+    decode_head=dict(
+        type='MultiDepthwiseSeparableASPPHead',
+        in_channels=960,
+        in_index=2,
+        channels=128,
+        dilations=(1, 12, 24, 36),
+        c1_in_channels=16,
+        c1_channels=48,
+        dropout_ratio=0.1,
+        num_classes=11,
+        norm_cfg=dict(type='SyncBN', requires_grad=True),
+        align_corners=False,
+        loss_decode=dict(type='CombinedCrossEntropyLoss', loss_weight=1.0)),
+    auxiliary_head=dict(
+        type='FCNHead',
+        in_channels=960,
+        in_index=2,
+        channels=128,
+        num_convs=1,
+        concat_input=False,
+        dropout_ratio=0.1,
+        num_classes=11,
+        norm_cfg=dict(type='SyncBN', requires_grad=True),
+        align_corners=False,
+        loss_decode=dict(
+            type='CrossEntropyLoss', use_sigmoid=False, loss_weight=0.4)),
+    train_cfg=dict(),
+    test_cfg=dict(mode='whole'))
+dataset_type = 'ADE20KDataset'
+data_root = './FoodSeg103/Images'
+img_norm_cfg = dict(
+    mean=[123.675, 116.28, 103.53], std=[58.395, 57.12, 57.375], to_rgb=True)
+crop_size = (512, 512)
+train_pipeline = [
+    dict(type='LoadImageFromFile'),
+    dict(type='LoadAnnotations', reduce_zero_label=False),
+    dict(type='Resize', img_scale=(2048, 512), ratio_range=(0.5, 2.0)),
+    dict(type='RandomCrop', crop_size=(512, 512), cat_max_ratio=0.75),
+    dict(type='RandomFlip', prob=0.5),
+    dict(type='PhotoMetricDistortion'),
+    dict(
+        type='Normalize',
+        mean=[123.675, 116.28, 103.53],
+        std=[58.395, 57.12, 57.375],
+        to_rgb=True),
+    dict(type='Pad', size=(512, 512), pad_val=0, seg_pad_val=255),
+    dict(type='DefaultFormatBundle'),
+    dict(type='Collect', keys=['img', 'gt_semantic_seg'])
+]
+test_pipeline = [
+    dict(type='LoadImageFromFile'),
+    dict(
+        type='MultiScaleFlipAug',
+        img_scale=(2048, 512),
+        flip=False,
+        transforms=[
+            dict(type='Resize', keep_ratio=True),
+            dict(type='RandomFlip'),
+            dict(
+                type='Normalize',
+                mean=[123.675, 116.28, 103.53],
+                std=[58.395, 57.12, 57.375],
+                to_rgb=True),
+            dict(type='ImageToTensor', keys=['img']),
+            dict(type='Collect', keys=['img'])
+        ])
+]
+data = dict(
+    samples_per_gpu=4,
+    workers_per_gpu=12,
+    train=dict(
+        type='ADE20KDataset',
+        data_root='./SegCombined/Images',
+        img_dir='img_dir/train',
+        ann_dir='ann_dir/train',
+        pipeline=[
+            dict(type='LoadImageFromFile'),
+            dict(type='LoadAnnotations', reduce_zero_label=False),
+            dict(type='Resize', img_scale=(2048, 512), ratio_range=(0.5, 2.0)),
+            dict(type='RandomCrop', crop_size=(512, 512), cat_max_ratio=0.75),
+            dict(type='RandomFlip', prob=0.5),
+            dict(type='PhotoMetricDistortion'),
+            dict(
+                type='Normalize',
+                mean=[123.675, 116.28, 103.53],
+                std=[58.395, 57.12, 57.375],
+                to_rgb=True),
+            dict(type='Pad', size=(512, 512), pad_val=0, seg_pad_val=255),
+            dict(type='DefaultFormatBundle'),
+            dict(type='Collect', keys=['img', 'gt_semantic_seg'])
+        ]),
+    val=dict(
+        type='ADE20KDataset',
+        data_root='./SegCombined/Images',
+        img_dir='img_dir/test',
+        ann_dir='ann_dir/test',
+        pipeline=[
+            dict(type='LoadImageFromFile'),
+            dict(
+                type='MultiScaleFlipAug',
+                img_scale=(2048, 512),
+                flip=False,
+                transforms=[
+                    dict(type='Resize', keep_ratio=True),
+                    dict(type='RandomFlip'),
+                    dict(
+                        type='Normalize',
+                        mean=[123.675, 116.28, 103.53],
+                        std=[58.395, 57.12, 57.375],
+                        to_rgb=True),
+                    dict(type='ImageToTensor', keys=['img']),
+                    dict(type='Collect', keys=['img'])
+                ])
+        ]),
+    test=dict(
+        type='ADE20KDataset',
+        data_root='./SegCombined/Images',
+        img_dir='img_dir/test',
+        ann_dir='ann_dir/test',
+        pipeline=[
+            dict(type='LoadImageFromFile'),
+            dict(
+                type='MultiScaleFlipAug',
+                img_scale=(2048, 512),
+                flip=False,
+                transforms=[
+                    dict(type='Resize', keep_ratio=True),
+                    dict(type='RandomFlip'),
+                    dict(
+                        type='Normalize',
+                        mean=[123.675, 116.28, 103.53],
+                        std=[58.395, 57.12, 57.375],
+                        to_rgb=True),
+                    dict(type='ImageToTensor', keys=['img']),
+                    dict(type='Collect', keys=['img'])
+                ])
+        ]))
+log_config = dict(
+    interval=100, hooks=[dict(type='TextLoggerHook', by_epoch=False)])
+dist_params = dict(backend='nccl')
+log_level = 'INFO'
+load_from = None
+resume_from = './work_dirs/deeplabv3plus_mobilenet_multi_combined_80k/latest.pth'
+workflow = [('train', 1)]
+cudnn_benchmark = True
+optimizer = dict(type='SGD', lr=0.01, momentum=0.9, weight_decay=0.0005)
+optimizer_config = dict()
+lr_config = dict(policy='poly', power=0.9, min_lr=0.0001, by_epoch=False)
+runner = dict(type='IterBasedRunner', max_iters=80000)
+checkpoint_config = dict(by_epoch=False, interval=5000, save_optimizer=True)
+evaluation = dict(interval=5000, metric='mIoU', pre_eval=True)
+seed = 0
+work_dir = './work_dirs/deeplabv3plus_mobilenet_multi_combined_80k'
+gpu_ids = range(0, 4)
+auto_resume = False
+
+2022-07-01 11:42:11,825 - mmseg - INFO - Set random seed to 1659440023, deterministic: False
+2022-07-01 11:42:12,001 - mmseg - INFO - initialize MobileNetV3 with init_cfg {'type': 'Pretrained', 'checkpoint': 'open-mmlab://contrib/mobilenet_v3_large'}
+2022-07-01 11:42:12,039 - mmseg - INFO - initialize MultiDepthwiseSeparableASPPHead with init_cfg {'type': 'Normal', 'std': 0.01, 'override': {'name': 'conv_seg'}}
+2022-07-01 11:42:12,046 - mmseg - INFO - initialize FCNHead with init_cfg {'type': 'Normal', 'std': 0.01, 'override': {'name': 'conv_seg'}}
+Name of parameter - Initialization information
+
+backbone.layer0.conv.weight - torch.Size([16, 3, 3, 3]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_large 
+
+backbone.layer0.bn.weight - torch.Size([16]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_large 
+
+backbone.layer0.bn.bias - torch.Size([16]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_large 
+
+backbone.layer1.depthwise_conv.conv.weight - torch.Size([16, 1, 3, 3]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_large 
+
+backbone.layer1.depthwise_conv.bn.weight - torch.Size([16]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_large 
+
+backbone.layer1.depthwise_conv.bn.bias - torch.Size([16]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_large 
+
+backbone.layer1.linear_conv.conv.weight - torch.Size([16, 16, 1, 1]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_large 
+
+backbone.layer1.linear_conv.bn.weight - torch.Size([16]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_large 
+
+backbone.layer1.linear_conv.bn.bias - torch.Size([16]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_large 
+
+backbone.layer2.expand_conv.conv.weight - torch.Size([64, 16, 1, 1]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_large 
+
+backbone.layer2.expand_conv.bn.weight - torch.Size([64]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_large 
+
+backbone.layer2.expand_conv.bn.bias - torch.Size([64]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_large 
+
+backbone.layer2.depthwise_conv.conv.weight - torch.Size([64, 1, 3, 3]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_large 
+
+backbone.layer2.depthwise_conv.bn.weight - torch.Size([64]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_large 
+
+backbone.layer2.depthwise_conv.bn.bias - torch.Size([64]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_large 
+
+backbone.layer2.linear_conv.conv.weight - torch.Size([24, 64, 1, 1]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_large 
+
+backbone.layer2.linear_conv.bn.weight - torch.Size([24]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_large 
+
+backbone.layer2.linear_conv.bn.bias - torch.Size([24]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_large 
+
+backbone.layer3.expand_conv.conv.weight - torch.Size([72, 24, 1, 1]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_large 
+
+backbone.layer3.expand_conv.bn.weight - torch.Size([72]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_large 
+
+backbone.layer3.expand_conv.bn.bias - torch.Size([72]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_large 
+
+backbone.layer3.depthwise_conv.conv.weight - torch.Size([72, 1, 3, 3]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_large 
+
+backbone.layer3.depthwise_conv.bn.weight - torch.Size([72]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_large 
+
+backbone.layer3.depthwise_conv.bn.bias - torch.Size([72]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_large 
+
+backbone.layer3.linear_conv.conv.weight - torch.Size([24, 72, 1, 1]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_large 
+
+backbone.layer3.linear_conv.bn.weight - torch.Size([24]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_large 
+
+backbone.layer3.linear_conv.bn.bias - torch.Size([24]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_large 
+
+backbone.layer4.expand_conv.conv.weight - torch.Size([72, 24, 1, 1]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_large 
+
+backbone.layer4.expand_conv.bn.weight - torch.Size([72]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_large 
+
+backbone.layer4.expand_conv.bn.bias - torch.Size([72]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_large 
+
+backbone.layer4.depthwise_conv.conv.weight - torch.Size([72, 1, 5, 5]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_large 
+
+backbone.layer4.depthwise_conv.bn.weight - torch.Size([72]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_large 
+
+backbone.layer4.depthwise_conv.bn.bias - torch.Size([72]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_large 
+
+backbone.layer4.se.conv1.conv.weight - torch.Size([24, 72, 1, 1]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_large 
+
+backbone.layer4.se.conv1.conv.bias - torch.Size([24]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_large 
+
+backbone.layer4.se.conv2.conv.weight - torch.Size([72, 24, 1, 1]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_large 
+
+backbone.layer4.se.conv2.conv.bias - torch.Size([72]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_large 
+
+backbone.layer4.linear_conv.conv.weight - torch.Size([40, 72, 1, 1]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_large 
+
+backbone.layer4.linear_conv.bn.weight - torch.Size([40]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_large 
+
+backbone.layer4.linear_conv.bn.bias - torch.Size([40]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_large 
+
+backbone.layer5.expand_conv.conv.weight - torch.Size([120, 40, 1, 1]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_large 
+
+backbone.layer5.expand_conv.bn.weight - torch.Size([120]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_large 
+
+backbone.layer5.expand_conv.bn.bias - torch.Size([120]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_large 
+
+backbone.layer5.depthwise_conv.conv.weight - torch.Size([120, 1, 5, 5]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_large 
+
+backbone.layer5.depthwise_conv.bn.weight - torch.Size([120]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_large 
+
+backbone.layer5.depthwise_conv.bn.bias - torch.Size([120]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_large 
+
+backbone.layer5.se.conv1.conv.weight - torch.Size([32, 120, 1, 1]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_large 
+
+backbone.layer5.se.conv1.conv.bias - torch.Size([32]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_large 
+
+backbone.layer5.se.conv2.conv.weight - torch.Size([120, 32, 1, 1]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_large 
+
+backbone.layer5.se.conv2.conv.bias - torch.Size([120]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_large 
+
+backbone.layer5.linear_conv.conv.weight - torch.Size([40, 120, 1, 1]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_large 
+
+backbone.layer5.linear_conv.bn.weight - torch.Size([40]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_large 
+
+backbone.layer5.linear_conv.bn.bias - torch.Size([40]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_large 
+
+backbone.layer6.expand_conv.conv.weight - torch.Size([120, 40, 1, 1]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_large 
+
+backbone.layer6.expand_conv.bn.weight - torch.Size([120]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_large 
+
+backbone.layer6.expand_conv.bn.bias - torch.Size([120]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_large 
+
+backbone.layer6.depthwise_conv.conv.weight - torch.Size([120, 1, 5, 5]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_large 
+
+backbone.layer6.depthwise_conv.bn.weight - torch.Size([120]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_large 
+
+backbone.layer6.depthwise_conv.bn.bias - torch.Size([120]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_large 
+
+backbone.layer6.se.conv1.conv.weight - torch.Size([32, 120, 1, 1]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_large 
+
+backbone.layer6.se.conv1.conv.bias - torch.Size([32]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_large 
+
+backbone.layer6.se.conv2.conv.weight - torch.Size([120, 32, 1, 1]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_large 
+
+backbone.layer6.se.conv2.conv.bias - torch.Size([120]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_large 
+
+backbone.layer6.linear_conv.conv.weight - torch.Size([40, 120, 1, 1]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_large 
+
+backbone.layer6.linear_conv.bn.weight - torch.Size([40]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_large 
+
+backbone.layer6.linear_conv.bn.bias - torch.Size([40]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_large 
+
+backbone.layer7.expand_conv.conv.weight - torch.Size([240, 40, 1, 1]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_large 
+
+backbone.layer7.expand_conv.bn.weight - torch.Size([240]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_large 
+
+backbone.layer7.expand_conv.bn.bias - torch.Size([240]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_large 
+
+backbone.layer7.depthwise_conv.conv.weight - torch.Size([240, 1, 3, 3]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_large 
+
+backbone.layer7.depthwise_conv.bn.weight - torch.Size([240]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_large 
+
+backbone.layer7.depthwise_conv.bn.bias - torch.Size([240]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_large 
+
+backbone.layer7.linear_conv.conv.weight - torch.Size([80, 240, 1, 1]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_large 
+
+backbone.layer7.linear_conv.bn.weight - torch.Size([80]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_large 
+
+backbone.layer7.linear_conv.bn.bias - torch.Size([80]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_large 
+
+backbone.layer8.expand_conv.conv.weight - torch.Size([200, 80, 1, 1]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_large 
+
+backbone.layer8.expand_conv.bn.weight - torch.Size([200]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_large 
+
+backbone.layer8.expand_conv.bn.bias - torch.Size([200]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_large 
+
+backbone.layer8.depthwise_conv.conv.weight - torch.Size([200, 1, 3, 3]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_large 
+
+backbone.layer8.depthwise_conv.bn.weight - torch.Size([200]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_large 
+
+backbone.layer8.depthwise_conv.bn.bias - torch.Size([200]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_large 
+
+backbone.layer8.linear_conv.conv.weight - torch.Size([80, 200, 1, 1]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_large 
+
+backbone.layer8.linear_conv.bn.weight - torch.Size([80]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_large 
+
+backbone.layer8.linear_conv.bn.bias - torch.Size([80]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_large 
+
+backbone.layer9.expand_conv.conv.weight - torch.Size([184, 80, 1, 1]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_large 
+
+backbone.layer9.expand_conv.bn.weight - torch.Size([184]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_large 
+
+backbone.layer9.expand_conv.bn.bias - torch.Size([184]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_large 
+
+backbone.layer9.depthwise_conv.conv.weight - torch.Size([184, 1, 3, 3]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_large 
+
+backbone.layer9.depthwise_conv.bn.weight - torch.Size([184]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_large 
+
+backbone.layer9.depthwise_conv.bn.bias - torch.Size([184]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_large 
+
+backbone.layer9.linear_conv.conv.weight - torch.Size([80, 184, 1, 1]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_large 
+
+backbone.layer9.linear_conv.bn.weight - torch.Size([80]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_large 
+
+backbone.layer9.linear_conv.bn.bias - torch.Size([80]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_large 
+
+backbone.layer10.expand_conv.conv.weight - torch.Size([184, 80, 1, 1]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_large 
+
+backbone.layer10.expand_conv.bn.weight - torch.Size([184]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_large 
+
+backbone.layer10.expand_conv.bn.bias - torch.Size([184]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_large 
+
+backbone.layer10.depthwise_conv.conv.weight - torch.Size([184, 1, 3, 3]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_large 
+
+backbone.layer10.depthwise_conv.bn.weight - torch.Size([184]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_large 
+
+backbone.layer10.depthwise_conv.bn.bias - torch.Size([184]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_large 
+
+backbone.layer10.linear_conv.conv.weight - torch.Size([80, 184, 1, 1]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_large 
+
+backbone.layer10.linear_conv.bn.weight - torch.Size([80]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_large 
+
+backbone.layer10.linear_conv.bn.bias - torch.Size([80]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_large 
+
+backbone.layer11.expand_conv.conv.weight - torch.Size([480, 80, 1, 1]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_large 
+
+backbone.layer11.expand_conv.bn.weight - torch.Size([480]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_large 
+
+backbone.layer11.expand_conv.bn.bias - torch.Size([480]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_large 
+
+backbone.layer11.depthwise_conv.conv.weight - torch.Size([480, 1, 3, 3]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_large 
+
+backbone.layer11.depthwise_conv.bn.weight - torch.Size([480]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_large 
+
+backbone.layer11.depthwise_conv.bn.bias - torch.Size([480]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_large 
+
+backbone.layer11.se.conv1.conv.weight - torch.Size([120, 480, 1, 1]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_large 
+
+backbone.layer11.se.conv1.conv.bias - torch.Size([120]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_large 
+
+backbone.layer11.se.conv2.conv.weight - torch.Size([480, 120, 1, 1]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_large 
+
+backbone.layer11.se.conv2.conv.bias - torch.Size([480]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_large 
+
+backbone.layer11.linear_conv.conv.weight - torch.Size([112, 480, 1, 1]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_large 
+
+backbone.layer11.linear_conv.bn.weight - torch.Size([112]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_large 
+
+backbone.layer11.linear_conv.bn.bias - torch.Size([112]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_large 
+
+backbone.layer12.expand_conv.conv.weight - torch.Size([672, 112, 1, 1]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_large 
+
+backbone.layer12.expand_conv.bn.weight - torch.Size([672]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_large 
+
+backbone.layer12.expand_conv.bn.bias - torch.Size([672]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_large 
+
+backbone.layer12.depthwise_conv.conv.weight - torch.Size([672, 1, 3, 3]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_large 
+
+backbone.layer12.depthwise_conv.bn.weight - torch.Size([672]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_large 
+
+backbone.layer12.depthwise_conv.bn.bias - torch.Size([672]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_large 
+
+backbone.layer12.se.conv1.conv.weight - torch.Size([168, 672, 1, 1]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_large 
+
+backbone.layer12.se.conv1.conv.bias - torch.Size([168]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_large 
+
+backbone.layer12.se.conv2.conv.weight - torch.Size([672, 168, 1, 1]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_large 
+
+backbone.layer12.se.conv2.conv.bias - torch.Size([672]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_large 
+
+backbone.layer12.linear_conv.conv.weight - torch.Size([112, 672, 1, 1]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_large 
+
+backbone.layer12.linear_conv.bn.weight - torch.Size([112]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_large 
+
+backbone.layer12.linear_conv.bn.bias - torch.Size([112]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_large 
+
+backbone.layer13.expand_conv.conv.weight - torch.Size([672, 112, 1, 1]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_large 
+
+backbone.layer13.expand_conv.bn.weight - torch.Size([672]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_large 
+
+backbone.layer13.expand_conv.bn.bias - torch.Size([672]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_large 
+
+backbone.layer13.depthwise_conv.conv.weight - torch.Size([672, 1, 5, 5]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_large 
+
+backbone.layer13.depthwise_conv.bn.weight - torch.Size([672]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_large 
+
+backbone.layer13.depthwise_conv.bn.bias - torch.Size([672]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_large 
+
+backbone.layer13.se.conv1.conv.weight - torch.Size([168, 672, 1, 1]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_large 
+
+backbone.layer13.se.conv1.conv.bias - torch.Size([168]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_large 
+
+backbone.layer13.se.conv2.conv.weight - torch.Size([672, 168, 1, 1]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_large 
+
+backbone.layer13.se.conv2.conv.bias - torch.Size([672]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_large 
+
+backbone.layer13.linear_conv.conv.weight - torch.Size([160, 672, 1, 1]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_large 
+
+backbone.layer13.linear_conv.bn.weight - torch.Size([160]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_large 
+
+backbone.layer13.linear_conv.bn.bias - torch.Size([160]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_large 
+
+backbone.layer14.expand_conv.conv.weight - torch.Size([960, 160, 1, 1]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_large 
+
+backbone.layer14.expand_conv.bn.weight - torch.Size([960]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_large 
+
+backbone.layer14.expand_conv.bn.bias - torch.Size([960]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_large 
+
+backbone.layer14.depthwise_conv.conv.weight - torch.Size([960, 1, 5, 5]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_large 
+
+backbone.layer14.depthwise_conv.bn.weight - torch.Size([960]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_large 
+
+backbone.layer14.depthwise_conv.bn.bias - torch.Size([960]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_large 
+
+backbone.layer14.se.conv1.conv.weight - torch.Size([240, 960, 1, 1]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_large 
+
+backbone.layer14.se.conv1.conv.bias - torch.Size([240]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_large 
+
+backbone.layer14.se.conv2.conv.weight - torch.Size([960, 240, 1, 1]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_large 
+
+backbone.layer14.se.conv2.conv.bias - torch.Size([960]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_large 
+
+backbone.layer14.linear_conv.conv.weight - torch.Size([160, 960, 1, 1]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_large 
+
+backbone.layer14.linear_conv.bn.weight - torch.Size([160]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_large 
+
+backbone.layer14.linear_conv.bn.bias - torch.Size([160]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_large 
+
+backbone.layer15.expand_conv.conv.weight - torch.Size([960, 160, 1, 1]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_large 
+
+backbone.layer15.expand_conv.bn.weight - torch.Size([960]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_large 
+
+backbone.layer15.expand_conv.bn.bias - torch.Size([960]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_large 
+
+backbone.layer15.depthwise_conv.conv.weight - torch.Size([960, 1, 5, 5]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_large 
+
+backbone.layer15.depthwise_conv.bn.weight - torch.Size([960]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_large 
+
+backbone.layer15.depthwise_conv.bn.bias - torch.Size([960]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_large 
+
+backbone.layer15.se.conv1.conv.weight - torch.Size([240, 960, 1, 1]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_large 
+
+backbone.layer15.se.conv1.conv.bias - torch.Size([240]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_large 
+
+backbone.layer15.se.conv2.conv.weight - torch.Size([960, 240, 1, 1]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_large 
+
+backbone.layer15.se.conv2.conv.bias - torch.Size([960]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_large 
+
+backbone.layer15.linear_conv.conv.weight - torch.Size([160, 960, 1, 1]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_large 
+
+backbone.layer15.linear_conv.bn.weight - torch.Size([160]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_large 
+
+backbone.layer15.linear_conv.bn.bias - torch.Size([160]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_large 
+
+backbone.layer16.conv.weight - torch.Size([960, 160, 1, 1]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_large 
+
+backbone.layer16.bn.weight - torch.Size([960]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_large 
+
+backbone.layer16.bn.bias - torch.Size([960]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_large 
+
+decode_head.conv_seg.weight - torch.Size([11, 128, 1, 1]): 
+NormalInit: mean=0, std=0.01, bias=0 
+
+decode_head.conv_seg.bias - torch.Size([11]): 
+NormalInit: mean=0, std=0.01, bias=0 
+
+decode_head.image_pool.1.conv.weight - torch.Size([128, 960, 1, 1]): 
+The value is the same before and after calling `init_weights` of MultiEncoderDecoder  
+
+decode_head.image_pool.1.bn.weight - torch.Size([128]): 
+The value is the same before and after calling `init_weights` of MultiEncoderDecoder  
+
+decode_head.image_pool.1.bn.bias - torch.Size([128]): 
+The value is the same before and after calling `init_weights` of MultiEncoderDecoder  
+
+decode_head.aspp_modules.0.conv.weight - torch.Size([128, 960, 1, 1]): 
+The value is the same before and after calling `init_weights` of MultiEncoderDecoder  
+
+decode_head.aspp_modules.0.bn.weight - torch.Size([128]): 
+The value is the same before and after calling `init_weights` of MultiEncoderDecoder  
+
+decode_head.aspp_modules.0.bn.bias - torch.Size([128]): 
+The value is the same before and after calling `init_weights` of MultiEncoderDecoder  
+
+decode_head.aspp_modules.1.depthwise_conv.conv.weight - torch.Size([960, 1, 3, 3]): 
+The value is the same before and after calling `init_weights` of MultiEncoderDecoder  
+
+decode_head.aspp_modules.1.depthwise_conv.bn.weight - torch.Size([960]): 
+The value is the same before and after calling `init_weights` of MultiEncoderDecoder  
+
+decode_head.aspp_modules.1.depthwise_conv.bn.bias - torch.Size([960]): 
+The value is the same before and after calling `init_weights` of MultiEncoderDecoder  
+
+decode_head.aspp_modules.1.pointwise_conv.conv.weight - torch.Size([128, 960, 1, 1]): 
+The value is the same before and after calling `init_weights` of MultiEncoderDecoder  
+
+decode_head.aspp_modules.1.pointwise_conv.bn.weight - torch.Size([128]): 
+The value is the same before and after calling `init_weights` of MultiEncoderDecoder  
+
+decode_head.aspp_modules.1.pointwise_conv.bn.bias - torch.Size([128]): 
+The value is the same before and after calling `init_weights` of MultiEncoderDecoder  
+
+decode_head.aspp_modules.2.depthwise_conv.conv.weight - torch.Size([960, 1, 3, 3]): 
+The value is the same before and after calling `init_weights` of MultiEncoderDecoder  
+
+decode_head.aspp_modules.2.depthwise_conv.bn.weight - torch.Size([960]): 
+The value is the same before and after calling `init_weights` of MultiEncoderDecoder  
+
+decode_head.aspp_modules.2.depthwise_conv.bn.bias - torch.Size([960]): 
+The value is the same before and after calling `init_weights` of MultiEncoderDecoder  
+
+decode_head.aspp_modules.2.pointwise_conv.conv.weight - torch.Size([128, 960, 1, 1]): 
+The value is the same before and after calling `init_weights` of MultiEncoderDecoder  
+
+decode_head.aspp_modules.2.pointwise_conv.bn.weight - torch.Size([128]): 
+The value is the same before and after calling `init_weights` of MultiEncoderDecoder  
+
+decode_head.aspp_modules.2.pointwise_conv.bn.bias - torch.Size([128]): 
+The value is the same before and after calling `init_weights` of MultiEncoderDecoder  
+
+decode_head.aspp_modules.3.depthwise_conv.conv.weight - torch.Size([960, 1, 3, 3]): 
+The value is the same before and after calling `init_weights` of MultiEncoderDecoder  
+
+decode_head.aspp_modules.3.depthwise_conv.bn.weight - torch.Size([960]): 
+The value is the same before and after calling `init_weights` of MultiEncoderDecoder  
+
+decode_head.aspp_modules.3.depthwise_conv.bn.bias - torch.Size([960]): 
+The value is the same before and after calling `init_weights` of MultiEncoderDecoder  
+
+decode_head.aspp_modules.3.pointwise_conv.conv.weight - torch.Size([128, 960, 1, 1]): 
+The value is the same before and after calling `init_weights` of MultiEncoderDecoder  
+
+decode_head.aspp_modules.3.pointwise_conv.bn.weight - torch.Size([128]): 
+The value is the same before and after calling `init_weights` of MultiEncoderDecoder  
+
+decode_head.aspp_modules.3.pointwise_conv.bn.bias - torch.Size([128]): 
+The value is the same before and after calling `init_weights` of MultiEncoderDecoder  
+
+decode_head.bottleneck.conv.weight - torch.Size([128, 640, 3, 3]): 
+Initialized by user-defined `init_weights` in ConvModule  
+
+decode_head.bottleneck.bn.weight - torch.Size([128]): 
+The value is the same before and after calling `init_weights` of MultiEncoderDecoder  
+
+decode_head.bottleneck.bn.bias - torch.Size([128]): 
+The value is the same before and after calling `init_weights` of MultiEncoderDecoder  
+
+decode_head.multi_label_classifier.weight - torch.Size([10, 960]): 
+The value is the same before and after calling `init_weights` of MultiEncoderDecoder  
+
+decode_head.multi_label_classifier.bias - torch.Size([10]): 
+The value is the same before and after calling `init_weights` of MultiEncoderDecoder  
+
+decode_head.c1_bottleneck.conv.weight - torch.Size([48, 16, 1, 1]): 
+Initialized by user-defined `init_weights` in ConvModule  
+
+decode_head.c1_bottleneck.bn.weight - torch.Size([48]): 
+The value is the same before and after calling `init_weights` of MultiEncoderDecoder  
+
+decode_head.c1_bottleneck.bn.bias - torch.Size([48]): 
+The value is the same before and after calling `init_weights` of MultiEncoderDecoder  
+
+decode_head.sep_bottleneck.0.depthwise_conv.conv.weight - torch.Size([176, 1, 3, 3]): 
+The value is the same before and after calling `init_weights` of MultiEncoderDecoder  
+
+decode_head.sep_bottleneck.0.depthwise_conv.bn.weight - torch.Size([176]): 
+The value is the same before and after calling `init_weights` of MultiEncoderDecoder  
+
+decode_head.sep_bottleneck.0.depthwise_conv.bn.bias - torch.Size([176]): 
+The value is the same before and after calling `init_weights` of MultiEncoderDecoder  
+
+decode_head.sep_bottleneck.0.pointwise_conv.conv.weight - torch.Size([128, 176, 1, 1]): 
+The value is the same before and after calling `init_weights` of MultiEncoderDecoder  
+
+decode_head.sep_bottleneck.0.pointwise_conv.bn.weight - torch.Size([128]): 
+The value is the same before and after calling `init_weights` of MultiEncoderDecoder  
+
+decode_head.sep_bottleneck.0.pointwise_conv.bn.bias - torch.Size([128]): 
+The value is the same before and after calling `init_weights` of MultiEncoderDecoder  
+
+decode_head.sep_bottleneck.1.depthwise_conv.conv.weight - torch.Size([128, 1, 3, 3]): 
+The value is the same before and after calling `init_weights` of MultiEncoderDecoder  
+
+decode_head.sep_bottleneck.1.depthwise_conv.bn.weight - torch.Size([128]): 
+The value is the same before and after calling `init_weights` of MultiEncoderDecoder  
+
+decode_head.sep_bottleneck.1.depthwise_conv.bn.bias - torch.Size([128]): 
+The value is the same before and after calling `init_weights` of MultiEncoderDecoder  
+
+decode_head.sep_bottleneck.1.pointwise_conv.conv.weight - torch.Size([128, 128, 1, 1]): 
+The value is the same before and after calling `init_weights` of MultiEncoderDecoder  
+
+decode_head.sep_bottleneck.1.pointwise_conv.bn.weight - torch.Size([128]): 
+The value is the same before and after calling `init_weights` of MultiEncoderDecoder  
+
+decode_head.sep_bottleneck.1.pointwise_conv.bn.bias - torch.Size([128]): 
+The value is the same before and after calling `init_weights` of MultiEncoderDecoder  
+
+auxiliary_head.conv_seg.weight - torch.Size([11, 128, 1, 1]): 
+NormalInit: mean=0, std=0.01, bias=0 
+
+auxiliary_head.conv_seg.bias - torch.Size([11]): 
+NormalInit: mean=0, std=0.01, bias=0 
+
+auxiliary_head.convs.0.conv.weight - torch.Size([128, 960, 3, 3]): 
+The value is the same before and after calling `init_weights` of MultiEncoderDecoder  
+
+auxiliary_head.convs.0.bn.weight - torch.Size([128]): 
+The value is the same before and after calling `init_weights` of MultiEncoderDecoder  
+
+auxiliary_head.convs.0.bn.bias - torch.Size([128]): 
+The value is the same before and after calling `init_weights` of MultiEncoderDecoder  
+2022-07-01 11:42:12,050 - mmseg - INFO - MultiEncoderDecoder(
+  (backbone): MobileNetV3(
+    (layer0): ConvModule(
+      (conv): Conv2dAdaptivePadding(3, 16, kernel_size=(3, 3), stride=(2, 2), bias=False)
+      (bn): SyncBatchNorm(16, eps=0.001, momentum=0.1, affine=True, track_running_stats=True)
+      (activate): Hardswish()
+    )
+    (layer1): InvertedResidualV3(
+      (depthwise_conv): ConvModule(
+        (conv): Conv2d(16, 16, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=16, bias=False)
+        (bn): SyncBatchNorm(16, eps=0.001, momentum=0.1, affine=True, track_running_stats=True)
+        (activate): ReLU(inplace=True)
+      )
+      (linear_conv): ConvModule(
+        (conv): Conv2d(16, 16, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        (bn): SyncBatchNorm(16, eps=0.001, momentum=0.1, affine=True, track_running_stats=True)
+      )
+    )
+    (layer2): InvertedResidualV3(
+      (expand_conv): ConvModule(
+        (conv): Conv2d(16, 64, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        (bn): SyncBatchNorm(64, eps=0.001, momentum=0.1, affine=True, track_running_stats=True)
+        (activate): ReLU(inplace=True)
+      )
+      (depthwise_conv): ConvModule(
+        (conv): Conv2dAdaptivePadding(64, 64, kernel_size=(3, 3), stride=(2, 2), groups=64, bias=False)
+        (bn): SyncBatchNorm(64, eps=0.001, momentum=0.1, affine=True, track_running_stats=True)
+        (activate): ReLU(inplace=True)
+      )
+      (linear_conv): ConvModule(
+        (conv): Conv2d(64, 24, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        (bn): SyncBatchNorm(24, eps=0.001, momentum=0.1, affine=True, track_running_stats=True)
+      )
+    )
+    (layer3): InvertedResidualV3(
+      (expand_conv): ConvModule(
+        (conv): Conv2d(24, 72, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        (bn): SyncBatchNorm(72, eps=0.001, momentum=0.1, affine=True, track_running_stats=True)
+        (activate): ReLU(inplace=True)
+      )
+      (depthwise_conv): ConvModule(
+        (conv): Conv2d(72, 72, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=72, bias=False)
+        (bn): SyncBatchNorm(72, eps=0.001, momentum=0.1, affine=True, track_running_stats=True)
+        (activate): ReLU(inplace=True)
+      )
+      (linear_conv): ConvModule(
+        (conv): Conv2d(72, 24, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        (bn): SyncBatchNorm(24, eps=0.001, momentum=0.1, affine=True, track_running_stats=True)
+      )
+    )
+    (layer4): InvertedResidualV3(
+      (expand_conv): ConvModule(
+        (conv): Conv2d(24, 72, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        (bn): SyncBatchNorm(72, eps=0.001, momentum=0.1, affine=True, track_running_stats=True)
+        (activate): ReLU(inplace=True)
+      )
+      (depthwise_conv): ConvModule(
+        (conv): Conv2dAdaptivePadding(72, 72, kernel_size=(5, 5), stride=(2, 2), groups=72, bias=False)
+        (bn): SyncBatchNorm(72, eps=0.001, momentum=0.1, affine=True, track_running_stats=True)
+        (activate): ReLU(inplace=True)
+      )
+      (se): SELayer(
+        (global_avgpool): AdaptiveAvgPool2d(output_size=1)
+        (conv1): ConvModule(
+          (conv): Conv2d(72, 24, kernel_size=(1, 1), stride=(1, 1))
+          (activate): ReLU(inplace=True)
+        )
+        (conv2): ConvModule(
+          (conv): Conv2d(24, 72, kernel_size=(1, 1), stride=(1, 1))
+          (activate): HSigmoid()
+        )
+      )
+      (linear_conv): ConvModule(
+        (conv): Conv2d(72, 40, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        (bn): SyncBatchNorm(40, eps=0.001, momentum=0.1, affine=True, track_running_stats=True)
+      )
+    )
+    (layer5): InvertedResidualV3(
+      (expand_conv): ConvModule(
+        (conv): Conv2d(40, 120, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        (bn): SyncBatchNorm(120, eps=0.001, momentum=0.1, affine=True, track_running_stats=True)
+        (activate): ReLU(inplace=True)
+      )
+      (depthwise_conv): ConvModule(
+        (conv): Conv2d(120, 120, kernel_size=(5, 5), stride=(1, 1), padding=(2, 2), groups=120, bias=False)
+        (bn): SyncBatchNorm(120, eps=0.001, momentum=0.1, affine=True, track_running_stats=True)
+        (activate): ReLU(inplace=True)
+      )
+      (se): SELayer(
+        (global_avgpool): AdaptiveAvgPool2d(output_size=1)
+        (conv1): ConvModule(
+          (conv): Conv2d(120, 32, kernel_size=(1, 1), stride=(1, 1))
+          (activate): ReLU(inplace=True)
+        )
+        (conv2): ConvModule(
+          (conv): Conv2d(32, 120, kernel_size=(1, 1), stride=(1, 1))
+          (activate): HSigmoid()
+        )
+      )
+      (linear_conv): ConvModule(
+        (conv): Conv2d(120, 40, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        (bn): SyncBatchNorm(40, eps=0.001, momentum=0.1, affine=True, track_running_stats=True)
+      )
+    )
+    (layer6): InvertedResidualV3(
+      (expand_conv): ConvModule(
+        (conv): Conv2d(40, 120, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        (bn): SyncBatchNorm(120, eps=0.001, momentum=0.1, affine=True, track_running_stats=True)
+        (activate): ReLU(inplace=True)
+      )
+      (depthwise_conv): ConvModule(
+        (conv): Conv2d(120, 120, kernel_size=(5, 5), stride=(1, 1), padding=(2, 2), groups=120, bias=False)
+        (bn): SyncBatchNorm(120, eps=0.001, momentum=0.1, affine=True, track_running_stats=True)
+        (activate): ReLU(inplace=True)
+      )
+      (se): SELayer(
+        (global_avgpool): AdaptiveAvgPool2d(output_size=1)
+        (conv1): ConvModule(
+          (conv): Conv2d(120, 32, kernel_size=(1, 1), stride=(1, 1))
+          (activate): ReLU(inplace=True)
+        )
+        (conv2): ConvModule(
+          (conv): Conv2d(32, 120, kernel_size=(1, 1), stride=(1, 1))
+          (activate): HSigmoid()
+        )
+      )
+      (linear_conv): ConvModule(
+        (conv): Conv2d(120, 40, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        (bn): SyncBatchNorm(40, eps=0.001, momentum=0.1, affine=True, track_running_stats=True)
+      )
+    )
+    (layer7): InvertedResidualV3(
+      (expand_conv): ConvModule(
+        (conv): Conv2d(40, 240, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        (bn): SyncBatchNorm(240, eps=0.001, momentum=0.1, affine=True, track_running_stats=True)
+        (activate): Hardswish()
+      )
+      (depthwise_conv): ConvModule(
+        (conv): Conv2dAdaptivePadding(240, 240, kernel_size=(3, 3), stride=(1, 1), dilation=(2, 2), groups=240, bias=False)
+        (bn): SyncBatchNorm(240, eps=0.001, momentum=0.1, affine=True, track_running_stats=True)
+        (activate): Hardswish()
+      )
+      (linear_conv): ConvModule(
+        (conv): Conv2d(240, 80, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        (bn): SyncBatchNorm(80, eps=0.001, momentum=0.1, affine=True, track_running_stats=True)
+      )
+    )
+    (layer8): InvertedResidualV3(
+      (expand_conv): ConvModule(
+        (conv): Conv2d(80, 200, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        (bn): SyncBatchNorm(200, eps=0.001, momentum=0.1, affine=True, track_running_stats=True)
+        (activate): Hardswish()
+      )
+      (depthwise_conv): ConvModule(
+        (conv): Conv2d(200, 200, kernel_size=(3, 3), stride=(1, 1), padding=(2, 2), dilation=(2, 2), groups=200, bias=False)
+        (bn): SyncBatchNorm(200, eps=0.001, momentum=0.1, affine=True, track_running_stats=True)
+        (activate): Hardswish()
+      )
+      (linear_conv): ConvModule(
+        (conv): Conv2d(200, 80, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        (bn): SyncBatchNorm(80, eps=0.001, momentum=0.1, affine=True, track_running_stats=True)
+      )
+    )
+    (layer9): InvertedResidualV3(
+      (expand_conv): ConvModule(
+        (conv): Conv2d(80, 184, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        (bn): SyncBatchNorm(184, eps=0.001, momentum=0.1, affine=True, track_running_stats=True)
+        (activate): Hardswish()
+      )
+      (depthwise_conv): ConvModule(
+        (conv): Conv2d(184, 184, kernel_size=(3, 3), stride=(1, 1), padding=(2, 2), dilation=(2, 2), groups=184, bias=False)
+        (bn): SyncBatchNorm(184, eps=0.001, momentum=0.1, affine=True, track_running_stats=True)
+        (activate): Hardswish()
+      )
+      (linear_conv): ConvModule(
+        (conv): Conv2d(184, 80, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        (bn): SyncBatchNorm(80, eps=0.001, momentum=0.1, affine=True, track_running_stats=True)
+      )
+    )
+    (layer10): InvertedResidualV3(
+      (expand_conv): ConvModule(
+        (conv): Conv2d(80, 184, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        (bn): SyncBatchNorm(184, eps=0.001, momentum=0.1, affine=True, track_running_stats=True)
+        (activate): Hardswish()
+      )
+      (depthwise_conv): ConvModule(
+        (conv): Conv2d(184, 184, kernel_size=(3, 3), stride=(1, 1), padding=(2, 2), dilation=(2, 2), groups=184, bias=False)
+        (bn): SyncBatchNorm(184, eps=0.001, momentum=0.1, affine=True, track_running_stats=True)
+        (activate): Hardswish()
+      )
+      (linear_conv): ConvModule(
+        (conv): Conv2d(184, 80, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        (bn): SyncBatchNorm(80, eps=0.001, momentum=0.1, affine=True, track_running_stats=True)
+      )
+    )
+    (layer11): InvertedResidualV3(
+      (expand_conv): ConvModule(
+        (conv): Conv2d(80, 480, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        (bn): SyncBatchNorm(480, eps=0.001, momentum=0.1, affine=True, track_running_stats=True)
+        (activate): Hardswish()
+      )
+      (depthwise_conv): ConvModule(
+        (conv): Conv2d(480, 480, kernel_size=(3, 3), stride=(1, 1), padding=(2, 2), dilation=(2, 2), groups=480, bias=False)
+        (bn): SyncBatchNorm(480, eps=0.001, momentum=0.1, affine=True, track_running_stats=True)
+        (activate): Hardswish()
+      )
+      (se): SELayer(
+        (global_avgpool): AdaptiveAvgPool2d(output_size=1)
+        (conv1): ConvModule(
+          (conv): Conv2d(480, 120, kernel_size=(1, 1), stride=(1, 1))
+          (activate): ReLU(inplace=True)
+        )
+        (conv2): ConvModule(
+          (conv): Conv2d(120, 480, kernel_size=(1, 1), stride=(1, 1))
+          (activate): HSigmoid()
+        )
+      )
+      (linear_conv): ConvModule(
+        (conv): Conv2d(480, 112, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        (bn): SyncBatchNorm(112, eps=0.001, momentum=0.1, affine=True, track_running_stats=True)
+      )
+    )
+    (layer12): InvertedResidualV3(
+      (expand_conv): ConvModule(
+        (conv): Conv2d(112, 672, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        (bn): SyncBatchNorm(672, eps=0.001, momentum=0.1, affine=True, track_running_stats=True)
+        (activate): Hardswish()
+      )
+      (depthwise_conv): ConvModule(
+        (conv): Conv2d(672, 672, kernel_size=(3, 3), stride=(1, 1), padding=(2, 2), dilation=(2, 2), groups=672, bias=False)
+        (bn): SyncBatchNorm(672, eps=0.001, momentum=0.1, affine=True, track_running_stats=True)
+        (activate): Hardswish()
+      )
+      (se): SELayer(
+        (global_avgpool): AdaptiveAvgPool2d(output_size=1)
+        (conv1): ConvModule(
+          (conv): Conv2d(672, 168, kernel_size=(1, 1), stride=(1, 1))
+          (activate): ReLU(inplace=True)
+        )
+        (conv2): ConvModule(
+          (conv): Conv2d(168, 672, kernel_size=(1, 1), stride=(1, 1))
+          (activate): HSigmoid()
+        )
+      )
+      (linear_conv): ConvModule(
+        (conv): Conv2d(672, 112, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        (bn): SyncBatchNorm(112, eps=0.001, momentum=0.1, affine=True, track_running_stats=True)
+      )
+    )
+    (layer13): InvertedResidualV3(
+      (expand_conv): ConvModule(
+        (conv): Conv2d(112, 672, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        (bn): SyncBatchNorm(672, eps=0.001, momentum=0.1, affine=True, track_running_stats=True)
+        (activate): Hardswish()
+      )
+      (depthwise_conv): ConvModule(
+        (conv): Conv2dAdaptivePadding(672, 672, kernel_size=(5, 5), stride=(1, 1), dilation=(4, 4), groups=672, bias=False)
+        (bn): SyncBatchNorm(672, eps=0.001, momentum=0.1, affine=True, track_running_stats=True)
+        (activate): Hardswish()
+      )
+      (se): SELayer(
+        (global_avgpool): AdaptiveAvgPool2d(output_size=1)
+        (conv1): ConvModule(
+          (conv): Conv2d(672, 168, kernel_size=(1, 1), stride=(1, 1))
+          (activate): ReLU(inplace=True)
+        )
+        (conv2): ConvModule(
+          (conv): Conv2d(168, 672, kernel_size=(1, 1), stride=(1, 1))
+          (activate): HSigmoid()
+        )
+      )
+      (linear_conv): ConvModule(
+        (conv): Conv2d(672, 160, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        (bn): SyncBatchNorm(160, eps=0.001, momentum=0.1, affine=True, track_running_stats=True)
+      )
+    )
+    (layer14): InvertedResidualV3(
+      (expand_conv): ConvModule(
+        (conv): Conv2d(160, 960, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        (bn): SyncBatchNorm(960, eps=0.001, momentum=0.1, affine=True, track_running_stats=True)
+        (activate): Hardswish()
+      )
+      (depthwise_conv): ConvModule(
+        (conv): Conv2d(960, 960, kernel_size=(5, 5), stride=(1, 1), padding=(8, 8), dilation=(4, 4), groups=960, bias=False)
+        (bn): SyncBatchNorm(960, eps=0.001, momentum=0.1, affine=True, track_running_stats=True)
+        (activate): Hardswish()
+      )
+      (se): SELayer(
+        (global_avgpool): AdaptiveAvgPool2d(output_size=1)
+        (conv1): ConvModule(
+          (conv): Conv2d(960, 240, kernel_size=(1, 1), stride=(1, 1))
+          (activate): ReLU(inplace=True)
+        )
+        (conv2): ConvModule(
+          (conv): Conv2d(240, 960, kernel_size=(1, 1), stride=(1, 1))
+          (activate): HSigmoid()
+        )
+      )
+      (linear_conv): ConvModule(
+        (conv): Conv2d(960, 160, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        (bn): SyncBatchNorm(160, eps=0.001, momentum=0.1, affine=True, track_running_stats=True)
+      )
+    )
+    (layer15): InvertedResidualV3(
+      (expand_conv): ConvModule(
+        (conv): Conv2d(160, 960, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        (bn): SyncBatchNorm(960, eps=0.001, momentum=0.1, affine=True, track_running_stats=True)
+        (activate): Hardswish()
+      )
+      (depthwise_conv): ConvModule(
+        (conv): Conv2d(960, 960, kernel_size=(5, 5), stride=(1, 1), padding=(8, 8), dilation=(4, 4), groups=960, bias=False)
+        (bn): SyncBatchNorm(960, eps=0.001, momentum=0.1, affine=True, track_running_stats=True)
+        (activate): Hardswish()
+      )
+      (se): SELayer(
+        (global_avgpool): AdaptiveAvgPool2d(output_size=1)
+        (conv1): ConvModule(
+          (conv): Conv2d(960, 240, kernel_size=(1, 1), stride=(1, 1))
+          (activate): ReLU(inplace=True)
+        )
+        (conv2): ConvModule(
+          (conv): Conv2d(240, 960, kernel_size=(1, 1), stride=(1, 1))
+          (activate): HSigmoid()
+        )
+      )
+      (linear_conv): ConvModule(
+        (conv): Conv2d(960, 160, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        (bn): SyncBatchNorm(160, eps=0.001, momentum=0.1, affine=True, track_running_stats=True)
+      )
+    )
+    (layer16): ConvModule(
+      (conv): Conv2d(160, 960, kernel_size=(1, 1), stride=(1, 1), dilation=(4, 4), bias=False)
+      (bn): SyncBatchNorm(960, eps=0.001, momentum=0.1, affine=True, track_running_stats=True)
+      (activate): Hardswish()
+    )
+  )
+  init_cfg={'type': 'Pretrained', 'checkpoint': 'open-mmlab://contrib/mobilenet_v3_large'}
+  (decode_head): MultiDepthwiseSeparableASPPHead(
+    input_transform=None, ignore_index=255, align_corners=False
+    (loss_decode): CombinedCrossEntropyLoss(avg_non_ignore=False)
+    (conv_seg): Conv2d(128, 11, kernel_size=(1, 1), stride=(1, 1))
+    (dropout): Dropout2d(p=0.1, inplace=False)
+    (image_pool): Sequential(
+      (0): AdaptiveAvgPool2d(output_size=1)
+      (1): ConvModule(
+        (conv): Conv2d(960, 128, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        (bn): SyncBatchNorm(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (activate): ReLU(inplace=True)
+      )
+    )
+    (aspp_modules): DepthwiseSeparableASPPModule(
+      (0): ConvModule(
+        (conv): Conv2d(960, 128, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        (bn): SyncBatchNorm(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (activate): ReLU(inplace=True)
+      )
+      (1): DepthwiseSeparableConvModule(
+        (depthwise_conv): ConvModule(
+          (conv): Conv2d(960, 960, kernel_size=(3, 3), stride=(1, 1), padding=(12, 12), dilation=(12, 12), groups=960, bias=False)
+          (bn): SyncBatchNorm(960, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (activate): ReLU(inplace=True)
+        )
+        (pointwise_conv): ConvModule(
+          (conv): Conv2d(960, 128, kernel_size=(1, 1), stride=(1, 1), bias=False)
+          (bn): SyncBatchNorm(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (activate): ReLU(inplace=True)
+        )
+      )
+      (2): DepthwiseSeparableConvModule(
+        (depthwise_conv): ConvModule(
+          (conv): Conv2d(960, 960, kernel_size=(3, 3), stride=(1, 1), padding=(24, 24), dilation=(24, 24), groups=960, bias=False)
+          (bn): SyncBatchNorm(960, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (activate): ReLU(inplace=True)
+        )
+        (pointwise_conv): ConvModule(
+          (conv): Conv2d(960, 128, kernel_size=(1, 1), stride=(1, 1), bias=False)
+          (bn): SyncBatchNorm(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (activate): ReLU(inplace=True)
+        )
+      )
+      (3): DepthwiseSeparableConvModule(
+        (depthwise_conv): ConvModule(
+          (conv): Conv2d(960, 960, kernel_size=(3, 3), stride=(1, 1), padding=(36, 36), dilation=(36, 36), groups=960, bias=False)
+          (bn): SyncBatchNorm(960, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (activate): ReLU(inplace=True)
+        )
+        (pointwise_conv): ConvModule(
+          (conv): Conv2d(960, 128, kernel_size=(1, 1), stride=(1, 1), bias=False)
+          (bn): SyncBatchNorm(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (activate): ReLU(inplace=True)
+        )
+      )
+    )
+    (bottleneck): ConvModule(
+      (conv): Conv2d(640, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      (bn): SyncBatchNorm(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (activate): ReLU(inplace=True)
+    )
+    (global_average_pooling): AdaptiveAvgPool2d(output_size=(1, 1))
+    (multi_label_classifier): Linear(in_features=960, out_features=10, bias=True)
+    (c1_bottleneck): ConvModule(
+      (conv): Conv2d(16, 48, kernel_size=(1, 1), stride=(1, 1), bias=False)
+      (bn): SyncBatchNorm(48, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (activate): ReLU(inplace=True)
+    )
+    (sep_bottleneck): Sequential(
+      (0): DepthwiseSeparableConvModule(
+        (depthwise_conv): ConvModule(
+          (conv): Conv2d(176, 176, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=176, bias=False)
+          (bn): SyncBatchNorm(176, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (activate): ReLU(inplace=True)
+        )
+        (pointwise_conv): ConvModule(
+          (conv): Conv2d(176, 128, kernel_size=(1, 1), stride=(1, 1), bias=False)
+          (bn): SyncBatchNorm(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (activate): ReLU(inplace=True)
+        )
+      )
+      (1): DepthwiseSeparableConvModule(
+        (depthwise_conv): ConvModule(
+          (conv): Conv2d(128, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=128, bias=False)
+          (bn): SyncBatchNorm(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (activate): ReLU(inplace=True)
+        )
+        (pointwise_conv): ConvModule(
+          (conv): Conv2d(128, 128, kernel_size=(1, 1), stride=(1, 1), bias=False)
+          (bn): SyncBatchNorm(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (activate): ReLU(inplace=True)
+        )
+      )
+    )
+  )
+  init_cfg={'type': 'Normal', 'std': 0.01, 'override': {'name': 'conv_seg'}}
+  (auxiliary_head): FCNHead(
+    input_transform=None, ignore_index=255, align_corners=False
+    (loss_decode): CrossEntropyLoss(avg_non_ignore=False)
+    (conv_seg): Conv2d(128, 11, kernel_size=(1, 1), stride=(1, 1))
+    (dropout): Dropout2d(p=0.1, inplace=False)
+    (convs): Sequential(
+      (0): ConvModule(
+        (conv): Conv2d(960, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+        (bn): SyncBatchNorm(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (activate): ReLU(inplace=True)
+      )
+    )
+  )
+  init_cfg={'type': 'Normal', 'std': 0.01, 'override': {'name': 'conv_seg'}}
+)
+2022-07-01 11:42:12,137 - mmseg - INFO - Loaded 5156 images
+2022-07-01 11:42:12,534 - mmseg - INFO - Loaded 2009 images
+2022-07-01 11:42:12,535 - mmseg - INFO - load checkpoint from local path: ./work_dirs/deeplabv3plus_mobilenet_multi_combined_80k/latest.pth
+2022-07-01 11:42:12,647 - mmseg - INFO - resumed from epoch: 16, iter 59999
+2022-07-01 11:42:12,648 - mmseg - INFO - Start running, host: hli5@manectric, work_dir: /nfs/nfs9/home/nobackup/hli5/FoodCV/work_dirs/deeplabv3plus_mobilenet_multi_combined_80k
+2022-07-01 11:42:12,648 - mmseg - INFO - Hooks will be executed in the following order:
+before_run:
+(VERY_HIGH   ) PolyLrUpdaterHook                  
+(NORMAL      ) CheckpointHook                     
+(LOW         ) DistEvalHook                       
+(VERY_LOW    ) TextLoggerHook                     
+ -------------------- 
+before_train_epoch:
+(VERY_HIGH   ) PolyLrUpdaterHook                  
+(LOW         ) IterTimerHook                      
+(LOW         ) DistEvalHook                       
+(VERY_LOW    ) TextLoggerHook                     
+ -------------------- 
+before_train_iter:
+(VERY_HIGH   ) PolyLrUpdaterHook                  
+(LOW         ) IterTimerHook                      
+(LOW         ) DistEvalHook                       
+ -------------------- 
+after_train_iter:
+(ABOVE_NORMAL) OptimizerHook                      
+(NORMAL      ) CheckpointHook                     
+(LOW         ) IterTimerHook                      
+(LOW         ) DistEvalHook                       
+(VERY_LOW    ) TextLoggerHook                     
+ -------------------- 
+after_train_epoch:
+(NORMAL      ) CheckpointHook                     
+(LOW         ) DistEvalHook                       
+(VERY_LOW    ) TextLoggerHook                     
+ -------------------- 
+before_val_epoch:
+(LOW         ) IterTimerHook                      
+(VERY_LOW    ) TextLoggerHook                     
+ -------------------- 
+before_val_iter:
+(LOW         ) IterTimerHook                      
+ -------------------- 
+after_val_iter:
+(LOW         ) IterTimerHook                      
+ -------------------- 
+after_val_epoch:
+(VERY_LOW    ) TextLoggerHook                     
+ -------------------- 
+after_run:
+(VERY_LOW    ) TextLoggerHook                     
+ -------------------- 
+2022-07-01 11:42:12,648 - mmseg - INFO - workflow: [('train', 1)], max: 80000 iters
+2022-07-01 11:42:12,649 - mmseg - INFO - Checkpoints will be saved to /nfs/nfs9/home/nobackup/hli5/FoodCV/work_dirs/deeplabv3plus_mobilenet_multi_combined_80k by HardDiskBackend.
+2022-07-01 11:43:00,259 - mmseg - INFO - Saving checkpoint at 60000 iterations
+2022-07-01 11:43:00,805 - mmseg - INFO - Exp name: deeplabv3plus_mobilenet_multi_combined_80k.py
+2022-07-01 11:43:00,805 - mmseg - INFO - Iter [60000/80000]	lr: 2.943e-03, eta: 202 days, 7:39:35, time: 8.740, data_time: 1.639, memory: 15900, decode.loss_ce_combined: 0.5869, decode.acc_seg: 82.9935, decode.bin_ce_loss: 0.1460, aux.loss_ce: 0.2408, aux.acc_seg: 78.5802, loss: 0.9736
+2022-07-01 11:47:11,992 - mmseg - INFO - per class results:
+2022-07-01 11:47:11,994 - mmseg - INFO - 
++--------------------+-------+-------+
+|       Class        |  IoU  |  Acc  |
++--------------------+-------+-------+
+|     Background     | 91.11 | 94.81 |
+|        Meat        | 66.05 | 84.59 |
+|     Nuts/seeds     |  47.6 | 68.52 |
+|        Eggs        | 43.31 | 54.06 |
+| Beans/lentils/peas | 19.36 | 34.83 |
+|       Fruit        | 58.99 | 73.05 |
+|       Grain        | 56.74 | 66.98 |
+|     Vegetables     | 67.66 | 83.47 |
+|       Dairy        | 30.69 | 42.26 |
+|    Sauce/Spread    | 29.72 | 47.78 |
+|     Soup/Drink     | 44.47 | 57.32 |
++--------------------+-------+-------+
+2022-07-01 11:47:11,994 - mmseg - INFO - Summary:
+2022-07-01 11:47:11,994 - mmseg - INFO - 
++-------+-------+-------+
+|  aAcc |  mIoU |  mAcc |
++-------+-------+-------+
+| 85.53 | 50.52 | 64.33 |
++-------+-------+-------+
+2022-07-01 11:47:12,002 - mmseg - INFO - Exp name: deeplabv3plus_mobilenet_multi_combined_80k.py
+2022-07-01 11:47:12,002 - mmseg - INFO - Iter(val) [503]	aAcc: 0.8553, mIoU: 0.5052, mAcc: 0.6433, IoU.Background: 0.9111, IoU.Meat: 0.6605, IoU.Nuts/seeds: 0.4760, IoU.Eggs: 0.4331, IoU.Beans/lentils/peas: 0.1936, IoU.Fruit: 0.5899, IoU.Grain: 0.5674, IoU.Vegetables: 0.6766, IoU.Dairy: 0.3069, IoU.Sauce/Spread: 0.2972, IoU.Soup/Drink: 0.4447, Acc.Background: 0.9481, Acc.Meat: 0.8459, Acc.Nuts/seeds: 0.6852, Acc.Eggs: 0.5406, Acc.Beans/lentils/peas: 0.3483, Acc.Fruit: 0.7305, Acc.Grain: 0.6698, Acc.Vegetables: 0.8347, Acc.Dairy: 0.4226, Acc.Sauce/Spread: 0.4778, Acc.Soup/Drink: 0.5732
+2022-07-01 11:47:50,932 - mmseg - INFO - Iter [60100/80000]	lr: 2.930e-03, eta: 2 days, 15:42:50, time: 2.901, data_time: 2.519, memory: 19739, decode.loss_ce_combined: 0.5173, decode.acc_seg: 86.0179, decode.bin_ce_loss: 0.1528, aux.loss_ce: 0.1848, aux.acc_seg: 82.7429, loss: 0.8549
+2022-07-01 11:48:30,470 - mmseg - INFO - Iter [60200/80000]	lr: 2.918e-03, eta: 1 day, 8:56:11, time: 0.395, data_time: 0.007, memory: 19739, decode.loss_ce_combined: 0.5145, decode.acc_seg: 86.4998, decode.bin_ce_loss: 0.1589, aux.loss_ce: 0.1792, aux.acc_seg: 83.3910, loss: 0.8527
+2022-07-01 11:49:09,592 - mmseg - INFO - Iter [60300/80000]	lr: 2.905e-03, eta: 22:35:39, time: 0.391, data_time: 0.006, memory: 19739, decode.loss_ce_combined: 0.5329, decode.acc_seg: 85.5008, decode.bin_ce_loss: 0.1582, aux.loss_ce: 0.1863, aux.acc_seg: 82.4125, loss: 0.8774
+2022-07-01 11:49:53,790 - mmseg - INFO - Iter [60400/80000]	lr: 2.892e-03, eta: 17:28:25, time: 0.442, data_time: 0.042, memory: 19739, decode.loss_ce_combined: 0.5070, decode.acc_seg: 86.4235, decode.bin_ce_loss: 0.1557, aux.loss_ce: 0.1781, aux.acc_seg: 83.2259, loss: 0.8408
+2022-07-01 11:50:33,350 - mmseg - INFO - Iter [60500/80000]	lr: 2.879e-03, eta: 14:20:32, time: 0.396, data_time: 0.006, memory: 19739, decode.loss_ce_combined: 0.4922, decode.acc_seg: 86.9083, decode.bin_ce_loss: 0.1488, aux.loss_ce: 0.1788, aux.acc_seg: 83.4130, loss: 0.8198
+2022-07-01 11:51:12,533 - mmseg - INFO - Iter [60600/80000]	lr: 2.866e-03, eta: 12:14:45, time: 0.392, data_time: 0.007, memory: 19739, decode.loss_ce_combined: 0.4797, decode.acc_seg: 87.2738, decode.bin_ce_loss: 0.1454, aux.loss_ce: 0.1702, aux.acc_seg: 84.1324, loss: 0.7953
+2022-07-01 11:51:56,646 - mmseg - INFO - Iter [60700/80000]	lr: 2.853e-03, eta: 10:46:56, time: 0.441, data_time: 0.051, memory: 19739, decode.loss_ce_combined: 0.4973, decode.acc_seg: 86.5540, decode.bin_ce_loss: 0.1487, aux.loss_ce: 0.1795, aux.acc_seg: 83.2832, loss: 0.8255
+2022-07-01 11:52:35,988 - mmseg - INFO - Iter [60800/80000]	lr: 2.841e-03, eta: 9:38:57, time: 0.393, data_time: 0.006, memory: 19739, decode.loss_ce_combined: 0.4855, decode.acc_seg: 86.9833, decode.bin_ce_loss: 0.1447, aux.loss_ce: 0.1762, aux.acc_seg: 83.6851, loss: 0.8063
+2022-07-01 11:53:15,395 - mmseg - INFO - Iter [60900/80000]	lr: 2.828e-03, eta: 8:45:56, time: 0.394, data_time: 0.006, memory: 19739, decode.loss_ce_combined: 0.5059, decode.acc_seg: 86.9437, decode.bin_ce_loss: 0.1575, aux.loss_ce: 0.1794, aux.acc_seg: 83.5118, loss: 0.8428
+2022-07-01 11:53:59,576 - mmseg - INFO - Exp name: deeplabv3plus_mobilenet_multi_combined_80k.py
+2022-07-01 11:53:59,577 - mmseg - INFO - Iter [61000/80000]	lr: 2.815e-03, eta: 8:04:53, time: 0.442, data_time: 0.039, memory: 19739, decode.loss_ce_combined: 0.5113, decode.acc_seg: 86.3411, decode.bin_ce_loss: 0.1520, aux.loss_ce: 0.1834, aux.acc_seg: 82.9028, loss: 0.8467
+2022-07-01 11:54:38,749 - mmseg - INFO - Iter [61100/80000]	lr: 2.802e-03, eta: 7:29:44, time: 0.392, data_time: 0.006, memory: 19739, decode.loss_ce_combined: 0.4954, decode.acc_seg: 86.8630, decode.bin_ce_loss: 0.1512, aux.loss_ce: 0.1776, aux.acc_seg: 83.5762, loss: 0.8242
+2022-07-01 11:55:18,396 - mmseg - INFO - Iter [61200/80000]	lr: 2.789e-03, eta: 7:00:27, time: 0.396, data_time: 0.006, memory: 19739, decode.loss_ce_combined: 0.4946, decode.acc_seg: 86.8838, decode.bin_ce_loss: 0.1523, aux.loss_ce: 0.1745, aux.acc_seg: 83.8689, loss: 0.8214
+2022-07-01 11:56:02,919 - mmseg - INFO - Iter [61300/80000]	lr: 2.776e-03, eta: 6:36:44, time: 0.445, data_time: 0.032, memory: 19739, decode.loss_ce_combined: 0.4969, decode.acc_seg: 86.6153, decode.bin_ce_loss: 0.1497, aux.loss_ce: 0.1774, aux.acc_seg: 83.3306, loss: 0.8240
+2022-07-01 11:56:42,248 - mmseg - INFO - Iter [61400/80000]	lr: 2.763e-03, eta: 6:15:09, time: 0.393, data_time: 0.006, memory: 19739, decode.loss_ce_combined: 0.4879, decode.acc_seg: 87.0292, decode.bin_ce_loss: 0.1462, aux.loss_ce: 0.1756, aux.acc_seg: 83.7649, loss: 0.8097
+2022-07-01 11:57:21,912 - mmseg - INFO - Iter [61500/80000]	lr: 2.751e-03, eta: 5:56:25, time: 0.397, data_time: 0.007, memory: 19739, decode.loss_ce_combined: 0.4938, decode.acc_seg: 87.1352, decode.bin_ce_loss: 0.1482, aux.loss_ce: 0.1757, aux.acc_seg: 83.9195, loss: 0.8177
+2022-07-01 11:58:01,292 - mmseg - INFO - Iter [61600/80000]	lr: 2.738e-03, eta: 5:39:53, time: 0.394, data_time: 0.007, memory: 19739, decode.loss_ce_combined: 0.5144, decode.acc_seg: 86.2571, decode.bin_ce_loss: 0.1508, aux.loss_ce: 0.1872, aux.acc_seg: 82.8299, loss: 0.8524
+2022-07-01 11:58:45,714 - mmseg - INFO - Iter [61700/80000]	lr: 2.725e-03, eta: 5:26:08, time: 0.444, data_time: 0.055, memory: 19739, decode.loss_ce_combined: 0.4865, decode.acc_seg: 86.8511, decode.bin_ce_loss: 0.1475, aux.loss_ce: 0.1771, aux.acc_seg: 83.3218, loss: 0.8112
+2022-07-01 11:59:25,182 - mmseg - INFO - Iter [61800/80000]	lr: 2.712e-03, eta: 5:12:59, time: 0.395, data_time: 0.006, memory: 19739, decode.loss_ce_combined: 0.4914, decode.acc_seg: 86.5141, decode.bin_ce_loss: 0.1495, aux.loss_ce: 0.1749, aux.acc_seg: 83.1688, loss: 0.8158
+2022-07-01 12:00:04,885 - mmseg - INFO - Iter [61900/80000]	lr: 2.699e-03, eta: 5:01:12, time: 0.397, data_time: 0.006, memory: 19739, decode.loss_ce_combined: 0.4917, decode.acc_seg: 86.9313, decode.bin_ce_loss: 0.1532, aux.loss_ce: 0.1736, aux.acc_seg: 83.8921, loss: 0.8184
+2022-07-01 12:00:49,222 - mmseg - INFO - Exp name: deeplabv3plus_mobilenet_multi_combined_80k.py
+2022-07-01 12:00:49,223 - mmseg - INFO - Iter [62000/80000]	lr: 2.686e-03, eta: 4:51:13, time: 0.443, data_time: 0.041, memory: 19739, decode.loss_ce_combined: 0.4754, decode.acc_seg: 87.3386, decode.bin_ce_loss: 0.1487, aux.loss_ce: 0.1712, aux.acc_seg: 84.0340, loss: 0.7954
+2022-07-01 12:01:28,682 - mmseg - INFO - Iter [62100/80000]	lr: 2.673e-03, eta: 4:41:25, time: 0.395, data_time: 0.006, memory: 19739, decode.loss_ce_combined: 0.5023, decode.acc_seg: 86.6702, decode.bin_ce_loss: 0.1502, aux.loss_ce: 0.1804, aux.acc_seg: 83.2990, loss: 0.8329
+2022-07-01 12:02:08,412 - mmseg - INFO - Iter [62200/80000]	lr: 2.660e-03, eta: 4:32:29, time: 0.397, data_time: 0.006, memory: 19739, decode.loss_ce_combined: 0.4951, decode.acc_seg: 86.7650, decode.bin_ce_loss: 0.1454, aux.loss_ce: 0.1776, aux.acc_seg: 83.5748, loss: 0.8182
+2022-07-01 12:02:52,216 - mmseg - INFO - Iter [62300/80000]	lr: 2.647e-03, eta: 4:24:47, time: 0.438, data_time: 0.037, memory: 19739, decode.loss_ce_combined: 0.4684, decode.acc_seg: 87.4399, decode.bin_ce_loss: 0.1386, aux.loss_ce: 0.1703, aux.acc_seg: 84.2158, loss: 0.7774
+2022-07-01 12:03:31,771 - mmseg - INFO - Iter [62400/80000]	lr: 2.634e-03, eta: 4:17:10, time: 0.396, data_time: 0.006, memory: 19739, decode.loss_ce_combined: 0.4749, decode.acc_seg: 87.3697, decode.bin_ce_loss: 0.1468, aux.loss_ce: 0.1688, aux.acc_seg: 84.0759, loss: 0.7905
+2022-07-01 12:04:11,284 - mmseg - INFO - Iter [62500/80000]	lr: 2.621e-03, eta: 4:10:05, time: 0.395, data_time: 0.006, memory: 19739, decode.loss_ce_combined: 0.4834, decode.acc_seg: 86.9890, decode.bin_ce_loss: 0.1468, aux.loss_ce: 0.1764, aux.acc_seg: 83.4041, loss: 0.8066
+2022-07-01 12:04:55,396 - mmseg - INFO - Iter [62600/80000]	lr: 2.608e-03, eta: 4:04:01, time: 0.441, data_time: 0.036, memory: 19739, decode.loss_ce_combined: 0.4991, decode.acc_seg: 86.7083, decode.bin_ce_loss: 0.1509, aux.loss_ce: 0.1784, aux.acc_seg: 83.3126, loss: 0.8284
+2022-07-01 12:05:34,766 - mmseg - INFO - Iter [62700/80000]	lr: 2.595e-03, eta: 3:57:50, time: 0.394, data_time: 0.007, memory: 19739, decode.loss_ce_combined: 0.4834, decode.acc_seg: 87.2816, decode.bin_ce_loss: 0.1466, aux.loss_ce: 0.1718, aux.acc_seg: 83.9077, loss: 0.8018
+2022-07-01 12:06:14,294 - mmseg - INFO - Iter [62800/80000]	lr: 2.582e-03, eta: 3:52:03, time: 0.395, data_time: 0.006, memory: 19739, decode.loss_ce_combined: 0.4808, decode.acc_seg: 87.2869, decode.bin_ce_loss: 0.1476, aux.loss_ce: 0.1749, aux.acc_seg: 83.7211, loss: 0.8032
+2022-07-01 12:06:58,779 - mmseg - INFO - Iter [62900/80000]	lr: 2.569e-03, eta: 3:47:07, time: 0.445, data_time: 0.045, memory: 19739, decode.loss_ce_combined: 0.5053, decode.acc_seg: 86.6743, decode.bin_ce_loss: 0.1524, aux.loss_ce: 0.1788, aux.acc_seg: 83.3412, loss: 0.8364
+2022-07-01 12:07:38,014 - mmseg - INFO - Exp name: deeplabv3plus_mobilenet_multi_combined_80k.py
+2022-07-01 12:07:38,014 - mmseg - INFO - Iter [63000/80000]	lr: 2.556e-03, eta: 3:41:59, time: 0.392, data_time: 0.006, memory: 19739, decode.loss_ce_combined: 0.4753, decode.acc_seg: 87.5248, decode.bin_ce_loss: 0.1483, aux.loss_ce: 0.1713, aux.acc_seg: 83.9993, loss: 0.7949
+2022-07-01 12:08:17,692 - mmseg - INFO - Iter [63100/80000]	lr: 2.543e-03, eta: 3:37:09, time: 0.397, data_time: 0.007, memory: 19739, decode.loss_ce_combined: 0.4695, decode.acc_seg: 87.4279, decode.bin_ce_loss: 0.1422, aux.loss_ce: 0.1701, aux.acc_seg: 84.2156, loss: 0.7818
+2022-07-01 12:08:57,502 - mmseg - INFO - Iter [63200/80000]	lr: 2.530e-03, eta: 3:32:37, time: 0.398, data_time: 0.006, memory: 19739, decode.loss_ce_combined: 0.4843, decode.acc_seg: 86.9185, decode.bin_ce_loss: 0.1469, aux.loss_ce: 0.1738, aux.acc_seg: 83.9140, loss: 0.8051
+2022-07-01 12:09:41,649 - mmseg - INFO - Iter [63300/80000]	lr: 2.517e-03, eta: 3:28:40, time: 0.441, data_time: 0.047, memory: 19739, decode.loss_ce_combined: 0.4817, decode.acc_seg: 86.9831, decode.bin_ce_loss: 0.1412, aux.loss_ce: 0.1778, aux.acc_seg: 83.5983, loss: 0.8007
+2022-07-01 12:10:21,207 - mmseg - INFO - Iter [63400/80000]	lr: 2.504e-03, eta: 3:24:32, time: 0.396, data_time: 0.007, memory: 19739, decode.loss_ce_combined: 0.4756, decode.acc_seg: 87.1341, decode.bin_ce_loss: 0.1441, aux.loss_ce: 0.1734, aux.acc_seg: 83.6724, loss: 0.7932
+2022-07-01 12:11:01,739 - mmseg - INFO - Iter [63500/80000]	lr: 2.491e-03, eta: 3:20:41, time: 0.405, data_time: 0.007, memory: 19739, decode.loss_ce_combined: 0.4879, decode.acc_seg: 86.8846, decode.bin_ce_loss: 0.1467, aux.loss_ce: 0.1751, aux.acc_seg: 83.6958, loss: 0.8097
+2022-07-01 12:11:46,163 - mmseg - INFO - Iter [63600/80000]	lr: 2.478e-03, eta: 3:17:18, time: 0.444, data_time: 0.030, memory: 19739, decode.loss_ce_combined: 0.4569, decode.acc_seg: 87.8027, decode.bin_ce_loss: 0.1385, aux.loss_ce: 0.1638, aux.acc_seg: 84.6515, loss: 0.7593
+2022-07-01 12:12:25,922 - mmseg - INFO - Iter [63700/80000]	lr: 2.465e-03, eta: 3:13:43, time: 0.398, data_time: 0.006, memory: 19739, decode.loss_ce_combined: 0.4775, decode.acc_seg: 87.0234, decode.bin_ce_loss: 0.1448, aux.loss_ce: 0.1749, aux.acc_seg: 83.7099, loss: 0.7972
+2022-07-01 12:13:05,441 - mmseg - INFO - Iter [63800/80000]	lr: 2.452e-03, eta: 3:10:16, time: 0.395, data_time: 0.007, memory: 19739, decode.loss_ce_combined: 0.4813, decode.acc_seg: 87.0333, decode.bin_ce_loss: 0.1468, aux.loss_ce: 0.1731, aux.acc_seg: 83.5800, loss: 0.8012
+2022-07-01 12:13:49,865 - mmseg - INFO - Iter [63900/80000]	lr: 2.439e-03, eta: 3:07:18, time: 0.444, data_time: 0.039, memory: 19739, decode.loss_ce_combined: 0.5020, decode.acc_seg: 86.4490, decode.bin_ce_loss: 0.1474, aux.loss_ce: 0.1831, aux.acc_seg: 83.0616, loss: 0.8324
+2022-07-01 12:14:29,228 - mmseg - INFO - Exp name: deeplabv3plus_mobilenet_multi_combined_80k.py
+2022-07-01 12:14:29,228 - mmseg - INFO - Iter [64000/80000]	lr: 2.426e-03, eta: 3:04:06, time: 0.394, data_time: 0.007, memory: 19739, decode.loss_ce_combined: 0.4812, decode.acc_seg: 87.0316, decode.bin_ce_loss: 0.1433, aux.loss_ce: 0.1743, aux.acc_seg: 83.7794, loss: 0.7989
+2022-07-01 12:15:08,754 - mmseg - INFO - Iter [64100/80000]	lr: 2.413e-03, eta: 3:01:03, time: 0.395, data_time: 0.006, memory: 19739, decode.loss_ce_combined: 0.4702, decode.acc_seg: 87.4837, decode.bin_ce_loss: 0.1426, aux.loss_ce: 0.1700, aux.acc_seg: 84.0207, loss: 0.7827
+2022-07-01 12:15:53,575 - mmseg - INFO - Iter [64200/80000]	lr: 2.400e-03, eta: 2:58:26, time: 0.448, data_time: 0.044, memory: 19739, decode.loss_ce_combined: 0.4716, decode.acc_seg: 87.5616, decode.bin_ce_loss: 0.1437, aux.loss_ce: 0.1701, aux.acc_seg: 84.2521, loss: 0.7854
+2022-07-01 12:16:32,887 - mmseg - INFO - Iter [64300/80000]	lr: 2.387e-03, eta: 2:55:35, time: 0.393, data_time: 0.007, memory: 19739, decode.loss_ce_combined: 0.4596, decode.acc_seg: 87.5416, decode.bin_ce_loss: 0.1408, aux.loss_ce: 0.1683, aux.acc_seg: 84.0190, loss: 0.7686
+2022-07-01 12:17:12,860 - mmseg - INFO - Iter [64400/80000]	lr: 2.373e-03, eta: 2:52:51, time: 0.400, data_time: 0.007, memory: 19739, decode.loss_ce_combined: 0.4912, decode.acc_seg: 86.9556, decode.bin_ce_loss: 0.1478, aux.loss_ce: 0.1787, aux.acc_seg: 83.5064, loss: 0.8177
+2022-07-01 12:17:52,070 - mmseg - INFO - Iter [64500/80000]	lr: 2.360e-03, eta: 2:50:11, time: 0.392, data_time: 0.007, memory: 19739, decode.loss_ce_combined: 0.4819, decode.acc_seg: 87.0420, decode.bin_ce_loss: 0.1471, aux.loss_ce: 0.1728, aux.acc_seg: 83.8925, loss: 0.8018
+2022-07-01 12:18:36,642 - mmseg - INFO - Iter [64600/80000]	lr: 2.347e-03, eta: 2:47:54, time: 0.446, data_time: 0.051, memory: 19739, decode.loss_ce_combined: 0.4488, decode.acc_seg: 87.6868, decode.bin_ce_loss: 0.1332, aux.loss_ce: 0.1660, aux.acc_seg: 84.3663, loss: 0.7480
+2022-07-01 12:19:15,999 - mmseg - INFO - Iter [64700/80000]	lr: 2.334e-03, eta: 2:45:23, time: 0.394, data_time: 0.006, memory: 19739, decode.loss_ce_combined: 0.4562, decode.acc_seg: 87.5631, decode.bin_ce_loss: 0.1349, aux.loss_ce: 0.1664, aux.acc_seg: 84.6513, loss: 0.7575
+2022-07-01 12:19:55,580 - mmseg - INFO - Iter [64800/80000]	lr: 2.321e-03, eta: 2:42:59, time: 0.396, data_time: 0.007, memory: 19739, decode.loss_ce_combined: 0.4958, decode.acc_seg: 86.8445, decode.bin_ce_loss: 0.1456, aux.loss_ce: 0.1777, aux.acc_seg: 83.4235, loss: 0.8192
+2022-07-01 12:20:39,920 - mmseg - INFO - Iter [64900/80000]	lr: 2.308e-03, eta: 2:40:53, time: 0.443, data_time: 0.050, memory: 19739, decode.loss_ce_combined: 0.4853, decode.acc_seg: 87.1343, decode.bin_ce_loss: 0.1429, aux.loss_ce: 0.1779, aux.acc_seg: 83.5285, loss: 0.8061
+2022-07-01 12:21:19,793 - mmseg - INFO - Saving checkpoint at 65000 iterations
+2022-07-01 12:21:20,472 - mmseg - INFO - Exp name: deeplabv3plus_mobilenet_multi_combined_80k.py
+2022-07-01 12:21:20,472 - mmseg - INFO - Iter [65000/80000]	lr: 2.295e-03, eta: 2:38:39, time: 0.406, data_time: 0.007, memory: 19739, decode.loss_ce_combined: 0.4723, decode.acc_seg: 87.3460, decode.bin_ce_loss: 0.1408, aux.loss_ce: 0.1727, aux.acc_seg: 84.0119, loss: 0.7859
+2022-07-01 12:21:48,005 - mmseg - INFO - per class results:
+2022-07-01 12:21:48,006 - mmseg - INFO - 
++--------------------+-------+-------+
+|       Class        |  IoU  |  Acc  |
++--------------------+-------+-------+
+|     Background     | 90.93 |  95.0 |
+|        Meat        | 66.16 | 77.57 |
+|     Nuts/seeds     |  39.9 |  52.9 |
+|        Eggs        | 33.94 | 66.02 |
+| Beans/lentils/peas | 16.06 | 18.56 |
+|       Fruit        | 56.57 | 74.68 |
+|       Grain        | 58.96 |  73.5 |
+|     Vegetables     | 67.66 | 83.83 |
+|       Dairy        | 32.27 | 45.12 |
+|    Sauce/Spread    | 31.01 | 41.49 |
+|     Soup/Drink     |  44.0 | 61.67 |
++--------------------+-------+-------+
+2022-07-01 12:21:48,006 - mmseg - INFO - Summary:
+2022-07-01 12:21:48,006 - mmseg - INFO - 
++-------+-------+-------+
+|  aAcc |  mIoU |  mAcc |
++-------+-------+-------+
+| 85.49 | 48.86 | 62.76 |
++-------+-------+-------+
+2022-07-01 12:21:48,015 - mmseg - INFO - Exp name: deeplabv3plus_mobilenet_multi_combined_80k.py
+2022-07-01 12:21:48,015 - mmseg - INFO - Iter(val) [503]	aAcc: 0.8549, mIoU: 0.4886, mAcc: 0.6276, IoU.Background: 0.9093, IoU.Meat: 0.6616, IoU.Nuts/seeds: 0.3990, IoU.Eggs: 0.3394, IoU.Beans/lentils/peas: 0.1606, IoU.Fruit: 0.5657, IoU.Grain: 0.5896, IoU.Vegetables: 0.6766, IoU.Dairy: 0.3227, IoU.Sauce/Spread: 0.3101, IoU.Soup/Drink: 0.4400, Acc.Background: 0.9500, Acc.Meat: 0.7757, Acc.Nuts/seeds: 0.5290, Acc.Eggs: 0.6602, Acc.Beans/lentils/peas: 0.1856, Acc.Fruit: 0.7468, Acc.Grain: 0.7350, Acc.Vegetables: 0.8383, Acc.Dairy: 0.4512, Acc.Sauce/Spread: 0.4149, Acc.Soup/Drink: 0.6167
+2022-07-01 12:22:27,430 - mmseg - INFO - Iter [65100/80000]	lr: 2.281e-03, eta: 2:37:45, time: 0.670, data_time: 0.282, memory: 19739, decode.loss_ce_combined: 0.4704, decode.acc_seg: 87.5870, decode.bin_ce_loss: 0.1419, aux.loss_ce: 0.1703, aux.acc_seg: 84.3626, loss: 0.7825
+2022-07-01 12:23:11,760 - mmseg - INFO - Iter [65200/80000]	lr: 2.268e-03, eta: 2:35:47, time: 0.443, data_time: 0.056, memory: 19739, decode.loss_ce_combined: 0.4527, decode.acc_seg: 87.9757, decode.bin_ce_loss: 0.1380, aux.loss_ce: 0.1636, aux.acc_seg: 84.6571, loss: 0.7543
+2022-07-01 12:23:51,347 - mmseg - INFO - Iter [65300/80000]	lr: 2.255e-03, eta: 2:33:39, time: 0.396, data_time: 0.006, memory: 19739, decode.loss_ce_combined: 0.4579, decode.acc_seg: 88.0561, decode.bin_ce_loss: 0.1419, aux.loss_ce: 0.1650, aux.acc_seg: 84.8161, loss: 0.7649
+2022-07-01 12:24:31,356 - mmseg - INFO - Iter [65400/80000]	lr: 2.242e-03, eta: 2:31:35, time: 0.400, data_time: 0.007, memory: 19739, decode.loss_ce_combined: 0.4531, decode.acc_seg: 87.7863, decode.bin_ce_loss: 0.1379, aux.loss_ce: 0.1674, aux.acc_seg: 84.2223, loss: 0.7584
+2022-07-01 12:25:15,990 - mmseg - INFO - Iter [65500/80000]	lr: 2.229e-03, eta: 2:29:46, time: 0.446, data_time: 0.051, memory: 19739, decode.loss_ce_combined: 0.4611, decode.acc_seg: 87.4919, decode.bin_ce_loss: 0.1397, aux.loss_ce: 0.1701, aux.acc_seg: 83.8715, loss: 0.7709
+2022-07-01 12:25:55,542 - mmseg - INFO - Iter [65600/80000]	lr: 2.215e-03, eta: 2:27:46, time: 0.396, data_time: 0.007, memory: 19739, decode.loss_ce_combined: 0.4524, decode.acc_seg: 87.7986, decode.bin_ce_loss: 0.1353, aux.loss_ce: 0.1669, aux.acc_seg: 84.1503, loss: 0.7546
+2022-07-01 12:26:35,380 - mmseg - INFO - Iter [65700/80000]	lr: 2.202e-03, eta: 2:25:50, time: 0.398, data_time: 0.007, memory: 19739, decode.loss_ce_combined: 0.4556, decode.acc_seg: 87.6549, decode.bin_ce_loss: 0.1371, aux.loss_ce: 0.1669, aux.acc_seg: 84.2900, loss: 0.7596
+2022-07-01 12:27:20,323 - mmseg - INFO - Iter [65800/80000]	lr: 2.189e-03, eta: 2:24:09, time: 0.449, data_time: 0.053, memory: 19739, decode.loss_ce_combined: 0.4614, decode.acc_seg: 87.8062, decode.bin_ce_loss: 0.1415, aux.loss_ce: 0.1696, aux.acc_seg: 84.3577, loss: 0.7724
+2022-07-01 12:27:59,859 - mmseg - INFO - Iter [65900/80000]	lr: 2.176e-03, eta: 2:22:17, time: 0.395, data_time: 0.007, memory: 19739, decode.loss_ce_combined: 0.4400, decode.acc_seg: 88.2254, decode.bin_ce_loss: 0.1354, aux.loss_ce: 0.1629, aux.acc_seg: 84.8946, loss: 0.7384
+2022-07-01 12:28:39,625 - mmseg - INFO - Exp name: deeplabv3plus_mobilenet_multi_combined_80k.py
+2022-07-01 12:28:39,625 - mmseg - INFO - Iter [66000/80000]	lr: 2.163e-03, eta: 2:20:28, time: 0.398, data_time: 0.006, memory: 19739, decode.loss_ce_combined: 0.4582, decode.acc_seg: 87.7885, decode.bin_ce_loss: 0.1422, aux.loss_ce: 0.1654, aux.acc_seg: 84.4490, loss: 0.7658
+2022-07-01 12:29:19,606 - mmseg - INFO - Iter [66100/80000]	lr: 2.149e-03, eta: 2:18:42, time: 0.400, data_time: 0.007, memory: 19739, decode.loss_ce_combined: 0.4673, decode.acc_seg: 87.4451, decode.bin_ce_loss: 0.1443, aux.loss_ce: 0.1695, aux.acc_seg: 84.2133, loss: 0.7812
+2022-07-01 12:30:04,393 - mmseg - INFO - Iter [66200/80000]	lr: 2.136e-03, eta: 2:17:08, time: 0.448, data_time: 0.048, memory: 19739, decode.loss_ce_combined: 0.4473, decode.acc_seg: 87.8744, decode.bin_ce_loss: 0.1366, aux.loss_ce: 0.1629, aux.acc_seg: 84.6986, loss: 0.7467
+2022-07-01 12:30:44,499 - mmseg - INFO - Iter [66300/80000]	lr: 2.123e-03, eta: 2:15:26, time: 0.401, data_time: 0.006, memory: 19739, decode.loss_ce_combined: 0.4499, decode.acc_seg: 88.0217, decode.bin_ce_loss: 0.1391, aux.loss_ce: 0.1654, aux.acc_seg: 84.2828, loss: 0.7544
+2022-07-01 12:31:24,236 - mmseg - INFO - Iter [66400/80000]	lr: 2.109e-03, eta: 2:13:45, time: 0.397, data_time: 0.006, memory: 19739, decode.loss_ce_combined: 0.4389, decode.acc_seg: 88.1105, decode.bin_ce_loss: 0.1314, aux.loss_ce: 0.1645, aux.acc_seg: 84.6883, loss: 0.7348
+2022-07-01 12:32:08,812 - mmseg - INFO - Iter [66500/80000]	lr: 2.096e-03, eta: 2:12:16, time: 0.446, data_time: 0.037, memory: 19739, decode.loss_ce_combined: 0.4454, decode.acc_seg: 88.0935, decode.bin_ce_loss: 0.1342, aux.loss_ce: 0.1671, aux.acc_seg: 84.3900, loss: 0.7468
+2022-07-01 12:32:48,483 - mmseg - INFO - Iter [66600/80000]	lr: 2.083e-03, eta: 2:10:39, time: 0.397, data_time: 0.006, memory: 19739, decode.loss_ce_combined: 0.4403, decode.acc_seg: 88.0949, decode.bin_ce_loss: 0.1336, aux.loss_ce: 0.1617, aux.acc_seg: 84.6919, loss: 0.7357
+2022-07-01 12:33:28,234 - mmseg - INFO - Iter [66700/80000]	lr: 2.069e-03, eta: 2:09:03, time: 0.397, data_time: 0.007, memory: 19739, decode.loss_ce_combined: 0.4641, decode.acc_seg: 87.5127, decode.bin_ce_loss: 0.1424, aux.loss_ce: 0.1702, aux.acc_seg: 84.0551, loss: 0.7768
+2022-07-01 12:34:12,615 - mmseg - INFO - Iter [66800/80000]	lr: 2.056e-03, eta: 2:07:38, time: 0.444, data_time: 0.053, memory: 19739, decode.loss_ce_combined: 0.4504, decode.acc_seg: 87.7636, decode.bin_ce_loss: 0.1339, aux.loss_ce: 0.1678, aux.acc_seg: 84.3606, loss: 0.7521
+2022-07-01 12:34:52,081 - mmseg - INFO - Iter [66900/80000]	lr: 2.043e-03, eta: 2:06:05, time: 0.395, data_time: 0.007, memory: 19739, decode.loss_ce_combined: 0.4424, decode.acc_seg: 88.1248, decode.bin_ce_loss: 0.1334, aux.loss_ce: 0.1648, aux.acc_seg: 84.5870, loss: 0.7406
+2022-07-01 12:35:31,667 - mmseg - INFO - Exp name: deeplabv3plus_mobilenet_multi_combined_80k.py
+2022-07-01 12:35:31,667 - mmseg - INFO - Iter [67000/80000]	lr: 2.029e-03, eta: 2:04:33, time: 0.396, data_time: 0.006, memory: 19739, decode.loss_ce_combined: 0.4537, decode.acc_seg: 87.6744, decode.bin_ce_loss: 0.1344, aux.loss_ce: 0.1703, aux.acc_seg: 84.0938, loss: 0.7584
+2022-07-01 12:36:16,299 - mmseg - INFO - Iter [67100/80000]	lr: 2.016e-03, eta: 2:03:12, time: 0.446, data_time: 0.039, memory: 19739, decode.loss_ce_combined: 0.4578, decode.acc_seg: 87.6892, decode.bin_ce_loss: 0.1380, aux.loss_ce: 0.1683, aux.acc_seg: 84.1678, loss: 0.7640
+2022-07-01 12:36:55,859 - mmseg - INFO - Iter [67200/80000]	lr: 2.003e-03, eta: 2:01:43, time: 0.396, data_time: 0.007, memory: 19739, decode.loss_ce_combined: 0.4257, decode.acc_seg: 88.5213, decode.bin_ce_loss: 0.1295, aux.loss_ce: 0.1602, aux.acc_seg: 84.7395, loss: 0.7154
+2022-07-01 12:37:35,596 - mmseg - INFO - Iter [67300/80000]	lr: 1.989e-03, eta: 2:00:16, time: 0.397, data_time: 0.007, memory: 19739, decode.loss_ce_combined: 0.4505, decode.acc_seg: 87.8627, decode.bin_ce_loss: 0.1358, aux.loss_ce: 0.1660, aux.acc_seg: 84.4004, loss: 0.7523
+2022-07-01 12:38:15,256 - mmseg - INFO - Iter [67400/80000]	lr: 1.976e-03, eta: 1:58:50, time: 0.397, data_time: 0.006, memory: 19739, decode.loss_ce_combined: 0.4415, decode.acc_seg: 88.0617, decode.bin_ce_loss: 0.1321, aux.loss_ce: 0.1638, aux.acc_seg: 84.5723, loss: 0.7375
+2022-07-01 12:38:59,961 - mmseg - INFO - Iter [67500/80000]	lr: 1.963e-03, eta: 1:57:34, time: 0.447, data_time: 0.040, memory: 19739, decode.loss_ce_combined: 0.4482, decode.acc_seg: 87.8897, decode.bin_ce_loss: 0.1302, aux.loss_ce: 0.1693, aux.acc_seg: 84.3650, loss: 0.7477
+2022-07-01 12:39:39,692 - mmseg - INFO - Iter [67600/80000]	lr: 1.949e-03, eta: 1:56:10, time: 0.397, data_time: 0.007, memory: 19739, decode.loss_ce_combined: 0.4353, decode.acc_seg: 88.1979, decode.bin_ce_loss: 0.1327, aux.loss_ce: 0.1605, aux.acc_seg: 84.9205, loss: 0.7285
+2022-07-01 12:40:19,624 - mmseg - INFO - Iter [67700/80000]	lr: 1.936e-03, eta: 1:54:48, time: 0.399, data_time: 0.006, memory: 19739, decode.loss_ce_combined: 0.4434, decode.acc_seg: 88.1356, decode.bin_ce_loss: 0.1333, aux.loss_ce: 0.1651, aux.acc_seg: 84.6678, loss: 0.7418
+2022-07-01 12:41:03,862 - mmseg - INFO - Iter [67800/80000]	lr: 1.922e-03, eta: 1:53:33, time: 0.442, data_time: 0.049, memory: 19739, decode.loss_ce_combined: 0.4506, decode.acc_seg: 87.9453, decode.bin_ce_loss: 0.1382, aux.loss_ce: 0.1651, aux.acc_seg: 84.5725, loss: 0.7539
+2022-07-01 12:41:43,649 - mmseg - INFO - Iter [67900/80000]	lr: 1.909e-03, eta: 1:52:13, time: 0.398, data_time: 0.007, memory: 19739, decode.loss_ce_combined: 0.4241, decode.acc_seg: 88.4388, decode.bin_ce_loss: 0.1260, aux.loss_ce: 0.1592, aux.acc_seg: 85.1070, loss: 0.7093
+2022-07-01 12:42:23,316 - mmseg - INFO - Exp name: deeplabv3plus_mobilenet_multi_combined_80k.py
+2022-07-01 12:42:23,316 - mmseg - INFO - Iter [68000/80000]	lr: 1.895e-03, eta: 1:50:53, time: 0.397, data_time: 0.007, memory: 19739, decode.loss_ce_combined: 0.4447, decode.acc_seg: 87.9708, decode.bin_ce_loss: 0.1345, aux.loss_ce: 0.1650, aux.acc_seg: 84.5764, loss: 0.7442
+2022-07-01 12:43:07,575 - mmseg - INFO - Iter [68100/80000]	lr: 1.882e-03, eta: 1:49:41, time: 0.443, data_time: 0.044, memory: 19739, decode.loss_ce_combined: 0.4101, decode.acc_seg: 89.0295, decode.bin_ce_loss: 0.1269, aux.loss_ce: 0.1565, aux.acc_seg: 85.2454, loss: 0.6935
+2022-07-01 12:43:47,080 - mmseg - INFO - Iter [68200/80000]	lr: 1.868e-03, eta: 1:48:23, time: 0.395, data_time: 0.007, memory: 19739, decode.loss_ce_combined: 0.4091, decode.acc_seg: 89.1627, decode.bin_ce_loss: 0.1279, aux.loss_ce: 0.1502, aux.acc_seg: 85.9547, loss: 0.6873
+2022-07-01 12:44:26,896 - mmseg - INFO - Iter [68300/80000]	lr: 1.855e-03, eta: 1:47:07, time: 0.398, data_time: 0.006, memory: 19739, decode.loss_ce_combined: 0.4421, decode.acc_seg: 88.1979, decode.bin_ce_loss: 0.1361, aux.loss_ce: 0.1630, aux.acc_seg: 84.7107, loss: 0.7411
+2022-07-01 12:45:11,412 - mmseg - INFO - Iter [68400/80000]	lr: 1.841e-03, eta: 1:45:57, time: 0.445, data_time: 0.045, memory: 19739, decode.loss_ce_combined: 0.4251, decode.acc_seg: 88.4897, decode.bin_ce_loss: 0.1231, aux.loss_ce: 0.1627, aux.acc_seg: 84.8654, loss: 0.7109
+2022-07-01 12:45:51,027 - mmseg - INFO - Iter [68500/80000]	lr: 1.828e-03, eta: 1:44:42, time: 0.396, data_time: 0.006, memory: 19739, decode.loss_ce_combined: 0.4490, decode.acc_seg: 87.6325, decode.bin_ce_loss: 0.1307, aux.loss_ce: 0.1681, aux.acc_seg: 84.3216, loss: 0.7478
+2022-07-01 12:46:31,173 - mmseg - INFO - Iter [68600/80000]	lr: 1.814e-03, eta: 1:43:28, time: 0.401, data_time: 0.006, memory: 19739, decode.loss_ce_combined: 0.4363, decode.acc_seg: 88.6655, decode.bin_ce_loss: 0.1346, aux.loss_ce: 0.1642, aux.acc_seg: 84.7835, loss: 0.7350
+2022-07-01 12:47:15,812 - mmseg - INFO - Iter [68700/80000]	lr: 1.801e-03, eta: 1:42:21, time: 0.446, data_time: 0.057, memory: 19739, decode.loss_ce_combined: 0.4484, decode.acc_seg: 88.0238, decode.bin_ce_loss: 0.1355, aux.loss_ce: 0.1657, aux.acc_seg: 84.5468, loss: 0.7496
+2022-07-01 12:47:55,955 - mmseg - INFO - Iter [68800/80000]	lr: 1.787e-03, eta: 1:41:09, time: 0.401, data_time: 0.007, memory: 19739, decode.loss_ce_combined: 0.4029, decode.acc_seg: 89.1016, decode.bin_ce_loss: 0.1197, aux.loss_ce: 0.1537, aux.acc_seg: 85.5980, loss: 0.6763
+2022-07-01 12:48:36,069 - mmseg - INFO - Iter [68900/80000]	lr: 1.774e-03, eta: 1:39:57, time: 0.401, data_time: 0.006, memory: 19739, decode.loss_ce_combined: 0.4354, decode.acc_seg: 88.3267, decode.bin_ce_loss: 0.1343, aux.loss_ce: 0.1602, aux.acc_seg: 85.0202, loss: 0.7300
+2022-07-01 12:49:15,707 - mmseg - INFO - Exp name: deeplabv3plus_mobilenet_multi_combined_80k.py
+2022-07-01 12:49:15,707 - mmseg - INFO - Iter [69000/80000]	lr: 1.760e-03, eta: 1:38:45, time: 0.396, data_time: 0.007, memory: 19739, decode.loss_ce_combined: 0.4278, decode.acc_seg: 88.6020, decode.bin_ce_loss: 0.1296, aux.loss_ce: 0.1610, aux.acc_seg: 84.8639, loss: 0.7184
+2022-07-01 12:49:59,860 - mmseg - INFO - Iter [69100/80000]	lr: 1.747e-03, eta: 1:37:40, time: 0.442, data_time: 0.041, memory: 19739, decode.loss_ce_combined: 0.4011, decode.acc_seg: 89.1591, decode.bin_ce_loss: 0.1211, aux.loss_ce: 0.1538, aux.acc_seg: 85.4337, loss: 0.6761
+2022-07-01 12:50:39,562 - mmseg - INFO - Iter [69200/80000]	lr: 1.733e-03, eta: 1:36:29, time: 0.397, data_time: 0.006, memory: 19739, decode.loss_ce_combined: 0.4144, decode.acc_seg: 89.2136, decode.bin_ce_loss: 0.1266, aux.loss_ce: 0.1578, aux.acc_seg: 85.7150, loss: 0.6988
+2022-07-01 12:51:19,307 - mmseg - INFO - Iter [69300/80000]	lr: 1.719e-03, eta: 1:35:20, time: 0.397, data_time: 0.006, memory: 19739, decode.loss_ce_combined: 0.4356, decode.acc_seg: 88.1934, decode.bin_ce_loss: 0.1318, aux.loss_ce: 0.1613, aux.acc_seg: 84.6850, loss: 0.7287
+2022-07-01 12:52:03,566 - mmseg - INFO - Iter [69400/80000]	lr: 1.706e-03, eta: 1:34:16, time: 0.443, data_time: 0.038, memory: 19739, decode.loss_ce_combined: 0.4080, decode.acc_seg: 89.0903, decode.bin_ce_loss: 0.1222, aux.loss_ce: 0.1540, aux.acc_seg: 85.7316, loss: 0.6841
+2022-07-01 12:52:43,028 - mmseg - INFO - Iter [69500/80000]	lr: 1.692e-03, eta: 1:33:07, time: 0.395, data_time: 0.007, memory: 19739, decode.loss_ce_combined: 0.4039, decode.acc_seg: 89.1013, decode.bin_ce_loss: 0.1254, aux.loss_ce: 0.1532, aux.acc_seg: 85.5173, loss: 0.6825
+2022-07-01 12:53:22,602 - mmseg - INFO - Iter [69600/80000]	lr: 1.678e-03, eta: 1:31:59, time: 0.396, data_time: 0.006, memory: 19739, decode.loss_ce_combined: 0.4299, decode.acc_seg: 88.4247, decode.bin_ce_loss: 0.1287, aux.loss_ce: 0.1629, aux.acc_seg: 84.7012, loss: 0.7214
+2022-07-01 12:54:06,837 - mmseg - INFO - Iter [69700/80000]	lr: 1.665e-03, eta: 1:30:57, time: 0.442, data_time: 0.055, memory: 19739, decode.loss_ce_combined: 0.4144, decode.acc_seg: 89.0247, decode.bin_ce_loss: 0.1265, aux.loss_ce: 0.1547, aux.acc_seg: 85.6224, loss: 0.6956
+2022-07-01 12:54:46,401 - mmseg - INFO - Iter [69800/80000]	lr: 1.651e-03, eta: 1:29:50, time: 0.396, data_time: 0.006, memory: 19739, decode.loss_ce_combined: 0.4025, decode.acc_seg: 89.1637, decode.bin_ce_loss: 0.1207, aux.loss_ce: 0.1538, aux.acc_seg: 85.5527, loss: 0.6770
+2022-07-01 12:55:26,291 - mmseg - INFO - Iter [69900/80000]	lr: 1.637e-03, eta: 1:28:44, time: 0.399, data_time: 0.006, memory: 19739, decode.loss_ce_combined: 0.4145, decode.acc_seg: 89.0862, decode.bin_ce_loss: 0.1266, aux.loss_ce: 0.1572, aux.acc_seg: 85.4300, loss: 0.6984
+2022-07-01 12:56:10,977 - mmseg - INFO - Saving checkpoint at 70000 iterations
+2022-07-01 12:56:11,778 - mmseg - INFO - Exp name: deeplabv3plus_mobilenet_multi_combined_80k.py
+2022-07-01 12:56:11,778 - mmseg - INFO - Iter [70000/80000]	lr: 1.624e-03, eta: 1:27:44, time: 0.455, data_time: 0.058, memory: 19739, decode.loss_ce_combined: 0.4318, decode.acc_seg: 88.4021, decode.bin_ce_loss: 0.1314, aux.loss_ce: 0.1600, aux.acc_seg: 85.1281, loss: 0.7232
+2022-07-01 12:56:39,461 - mmseg - INFO - per class results:
+2022-07-01 12:56:39,462 - mmseg - INFO - 
++--------------------+-------+-------+
+|       Class        |  IoU  |  Acc  |
++--------------------+-------+-------+
+|     Background     | 91.24 |  95.1 |
+|        Meat        | 65.45 | 75.36 |
+|     Nuts/seeds     | 43.31 | 67.43 |
+|        Eggs        | 42.04 | 62.36 |
+| Beans/lentils/peas | 16.65 | 24.59 |
+|       Fruit        | 58.99 | 69.26 |
+|       Grain        | 61.87 | 76.92 |
+|     Vegetables     |  67.5 | 86.01 |
+|       Dairy        | 32.68 | 48.55 |
+|    Sauce/Spread    | 31.37 | 44.06 |
+|     Soup/Drink     | 43.65 | 59.68 |
++--------------------+-------+-------+
+2022-07-01 12:56:39,462 - mmseg - INFO - Summary:
+2022-07-01 12:56:39,462 - mmseg - INFO - 
++-------+-------+-------+
+|  aAcc |  mIoU |  mAcc |
++-------+-------+-------+
+| 85.89 | 50.43 | 64.49 |
++-------+-------+-------+
+2022-07-01 12:56:39,473 - mmseg - INFO - Exp name: deeplabv3plus_mobilenet_multi_combined_80k.py
+2022-07-01 12:56:39,473 - mmseg - INFO - Iter(val) [503]	aAcc: 0.8589, mIoU: 0.5043, mAcc: 0.6449, IoU.Background: 0.9124, IoU.Meat: 0.6545, IoU.Nuts/seeds: 0.4331, IoU.Eggs: 0.4204, IoU.Beans/lentils/peas: 0.1665, IoU.Fruit: 0.5899, IoU.Grain: 0.6187, IoU.Vegetables: 0.6750, IoU.Dairy: 0.3268, IoU.Sauce/Spread: 0.3137, IoU.Soup/Drink: 0.4365, Acc.Background: 0.9510, Acc.Meat: 0.7536, Acc.Nuts/seeds: 0.6743, Acc.Eggs: 0.6236, Acc.Beans/lentils/peas: 0.2459, Acc.Fruit: 0.6926, Acc.Grain: 0.7692, Acc.Vegetables: 0.8601, Acc.Dairy: 0.4855, Acc.Sauce/Spread: 0.4406, Acc.Soup/Drink: 0.5968
+2022-07-01 12:57:19,130 - mmseg - INFO - Iter [70100/80000]	lr: 1.610e-03, eta: 1:27:06, time: 0.673, data_time: 0.283, memory: 19739, decode.loss_ce_combined: 0.4023, decode.acc_seg: 89.2128, decode.bin_ce_loss: 0.1216, aux.loss_ce: 0.1537, aux.acc_seg: 85.7131, loss: 0.6776
+2022-07-01 12:57:59,244 - mmseg - INFO - Iter [70200/80000]	lr: 1.596e-03, eta: 1:26:01, time: 0.401, data_time: 0.006, memory: 19739, decode.loss_ce_combined: 0.4215, decode.acc_seg: 88.7208, decode.bin_ce_loss: 0.1296, aux.loss_ce: 0.1587, aux.acc_seg: 85.2162, loss: 0.7099
+2022-07-01 12:58:38,694 - mmseg - INFO - Iter [70300/80000]	lr: 1.582e-03, eta: 1:24:56, time: 0.394, data_time: 0.007, memory: 19739, decode.loss_ce_combined: 0.4145, decode.acc_seg: 88.9785, decode.bin_ce_loss: 0.1270, aux.loss_ce: 0.1532, aux.acc_seg: 85.5630, loss: 0.6948
+2022-07-01 12:59:23,877 - mmseg - INFO - Iter [70400/80000]	lr: 1.569e-03, eta: 1:23:56, time: 0.452, data_time: 0.042, memory: 19739, decode.loss_ce_combined: 0.3891, decode.acc_seg: 89.4891, decode.bin_ce_loss: 0.1193, aux.loss_ce: 0.1506, aux.acc_seg: 85.9484, loss: 0.6591
+2022-07-01 13:00:03,810 - mmseg - INFO - Iter [70500/80000]	lr: 1.555e-03, eta: 1:22:52, time: 0.399, data_time: 0.006, memory: 19739, decode.loss_ce_combined: 0.4137, decode.acc_seg: 88.9460, decode.bin_ce_loss: 0.1263, aux.loss_ce: 0.1566, aux.acc_seg: 85.3239, loss: 0.6965
+2022-07-01 13:00:43,788 - mmseg - INFO - Iter [70600/80000]	lr: 1.541e-03, eta: 1:21:49, time: 0.400, data_time: 0.007, memory: 19739, decode.loss_ce_combined: 0.4079, decode.acc_seg: 89.0974, decode.bin_ce_loss: 0.1267, aux.loss_ce: 0.1538, aux.acc_seg: 85.4303, loss: 0.6884
+2022-07-01 13:01:28,196 - mmseg - INFO - Iter [70700/80000]	lr: 1.527e-03, eta: 1:20:50, time: 0.444, data_time: 0.046, memory: 19739, decode.loss_ce_combined: 0.3888, decode.acc_seg: 89.5669, decode.bin_ce_loss: 0.1161, aux.loss_ce: 0.1480, aux.acc_seg: 86.3812, loss: 0.6529
+2022-07-01 13:02:08,044 - mmseg - INFO - Iter [70800/80000]	lr: 1.514e-03, eta: 1:19:47, time: 0.398, data_time: 0.006, memory: 19739, decode.loss_ce_combined: 0.4034, decode.acc_seg: 89.0707, decode.bin_ce_loss: 0.1224, aux.loss_ce: 0.1525, aux.acc_seg: 85.5345, loss: 0.6783
+2022-07-01 13:02:47,666 - mmseg - INFO - Iter [70900/80000]	lr: 1.500e-03, eta: 1:18:45, time: 0.396, data_time: 0.006, memory: 19739, decode.loss_ce_combined: 0.4017, decode.acc_seg: 89.2216, decode.bin_ce_loss: 0.1238, aux.loss_ce: 0.1522, aux.acc_seg: 85.7506, loss: 0.6778
+2022-07-01 13:03:31,894 - mmseg - INFO - Exp name: deeplabv3plus_mobilenet_multi_combined_80k.py
+2022-07-01 13:03:31,894 - mmseg - INFO - Iter [71000/80000]	lr: 1.486e-03, eta: 1:17:47, time: 0.442, data_time: 0.045, memory: 19739, decode.loss_ce_combined: 0.3980, decode.acc_seg: 89.1695, decode.bin_ce_loss: 0.1187, aux.loss_ce: 0.1507, aux.acc_seg: 85.9289, loss: 0.6674
+2022-07-01 13:04:11,634 - mmseg - INFO - Iter [71100/80000]	lr: 1.472e-03, eta: 1:16:45, time: 0.397, data_time: 0.007, memory: 19739, decode.loss_ce_combined: 0.4031, decode.acc_seg: 89.1836, decode.bin_ce_loss: 0.1225, aux.loss_ce: 0.1539, aux.acc_seg: 85.5704, loss: 0.6795
+2022-07-01 13:04:51,471 - mmseg - INFO - Iter [71200/80000]	lr: 1.458e-03, eta: 1:15:44, time: 0.398, data_time: 0.006, memory: 19739, decode.loss_ce_combined: 0.4012, decode.acc_seg: 89.3473, decode.bin_ce_loss: 0.1240, aux.loss_ce: 0.1520, aux.acc_seg: 85.9249, loss: 0.6772
+2022-07-01 13:05:35,191 - mmseg - INFO - Iter [71300/80000]	lr: 1.444e-03, eta: 1:14:46, time: 0.437, data_time: 0.052, memory: 19739, decode.loss_ce_combined: 0.3783, decode.acc_seg: 89.7277, decode.bin_ce_loss: 0.1148, aux.loss_ce: 0.1479, aux.acc_seg: 85.9595, loss: 0.6410
+2022-07-01 13:06:14,750 - mmseg - INFO - Iter [71400/80000]	lr: 1.430e-03, eta: 1:13:46, time: 0.396, data_time: 0.006, memory: 19739, decode.loss_ce_combined: 0.4092, decode.acc_seg: 88.7130, decode.bin_ce_loss: 0.1206, aux.loss_ce: 0.1580, aux.acc_seg: 85.1904, loss: 0.6878
+2022-07-01 13:06:54,667 - mmseg - INFO - Iter [71500/80000]	lr: 1.416e-03, eta: 1:12:46, time: 0.399, data_time: 0.007, memory: 19739, decode.loss_ce_combined: 0.3882, decode.acc_seg: 89.3296, decode.bin_ce_loss: 0.1144, aux.loss_ce: 0.1494, aux.acc_seg: 85.9318, loss: 0.6519
+2022-07-01 13:07:39,836 - mmseg - INFO - Iter [71600/80000]	lr: 1.402e-03, eta: 1:11:50, time: 0.452, data_time: 0.036, memory: 19739, decode.loss_ce_combined: 0.4035, decode.acc_seg: 88.9164, decode.bin_ce_loss: 0.1222, aux.loss_ce: 0.1532, aux.acc_seg: 85.4790, loss: 0.6789
+2022-07-01 13:08:19,418 - mmseg - INFO - Iter [71700/80000]	lr: 1.388e-03, eta: 1:10:50, time: 0.396, data_time: 0.007, memory: 19739, decode.loss_ce_combined: 0.4066, decode.acc_seg: 89.0540, decode.bin_ce_loss: 0.1245, aux.loss_ce: 0.1563, aux.acc_seg: 85.3224, loss: 0.6873
+2022-07-01 13:08:59,101 - mmseg - INFO - Iter [71800/80000]	lr: 1.374e-03, eta: 1:09:51, time: 0.397, data_time: 0.007, memory: 19739, decode.loss_ce_combined: 0.3953, decode.acc_seg: 89.2194, decode.bin_ce_loss: 0.1165, aux.loss_ce: 0.1536, aux.acc_seg: 85.6627, loss: 0.6654
+2022-07-01 13:09:38,549 - mmseg - INFO - Iter [71900/80000]	lr: 1.360e-03, eta: 1:08:52, time: 0.394, data_time: 0.006, memory: 19739, decode.loss_ce_combined: 0.3966, decode.acc_seg: 89.1675, decode.bin_ce_loss: 0.1194, aux.loss_ce: 0.1520, aux.acc_seg: 85.7705, loss: 0.6679
+2022-07-01 13:10:23,191 - mmseg - INFO - Exp name: deeplabv3plus_mobilenet_multi_combined_80k.py
+2022-07-01 13:10:23,191 - mmseg - INFO - Iter [72000/80000]	lr: 1.346e-03, eta: 1:07:57, time: 0.446, data_time: 0.044, memory: 19739, decode.loss_ce_combined: 0.3669, decode.acc_seg: 90.0736, decode.bin_ce_loss: 0.1143, aux.loss_ce: 0.1398, aux.acc_seg: 86.7671, loss: 0.6211
+2022-07-01 13:11:03,299 - mmseg - INFO - Iter [72100/80000]	lr: 1.332e-03, eta: 1:06:59, time: 0.401, data_time: 0.007, memory: 19739, decode.loss_ce_combined: 0.3832, decode.acc_seg: 89.6533, decode.bin_ce_loss: 0.1158, aux.loss_ce: 0.1471, aux.acc_seg: 86.3368, loss: 0.6461
+2022-07-01 13:11:43,080 - mmseg - INFO - Iter [72200/80000]	lr: 1.318e-03, eta: 1:06:01, time: 0.398, data_time: 0.006, memory: 19739, decode.loss_ce_combined: 0.3878, decode.acc_seg: 89.4461, decode.bin_ce_loss: 0.1182, aux.loss_ce: 0.1511, aux.acc_seg: 85.7647, loss: 0.6571
+2022-07-01 13:12:27,390 - mmseg - INFO - Iter [72300/80000]	lr: 1.304e-03, eta: 1:05:06, time: 0.443, data_time: 0.031, memory: 19739, decode.loss_ce_combined: 0.3882, decode.acc_seg: 89.5892, decode.bin_ce_loss: 0.1168, aux.loss_ce: 0.1490, aux.acc_seg: 86.1059, loss: 0.6540
+2022-07-01 13:13:07,158 - mmseg - INFO - Iter [72400/80000]	lr: 1.290e-03, eta: 1:04:08, time: 0.398, data_time: 0.007, memory: 19739, decode.loss_ce_combined: 0.3698, decode.acc_seg: 89.9686, decode.bin_ce_loss: 0.1088, aux.loss_ce: 0.1475, aux.acc_seg: 86.1236, loss: 0.6262
+2022-07-01 13:13:46,526 - mmseg - INFO - Iter [72500/80000]	lr: 1.276e-03, eta: 1:03:11, time: 0.394, data_time: 0.007, memory: 19739, decode.loss_ce_combined: 0.3883, decode.acc_seg: 89.7803, decode.bin_ce_loss: 0.1197, aux.loss_ce: 0.1478, aux.acc_seg: 86.3483, loss: 0.6558
+2022-07-01 13:14:31,608 - mmseg - INFO - Iter [72600/80000]	lr: 1.262e-03, eta: 1:02:17, time: 0.451, data_time: 0.043, memory: 19739, decode.loss_ce_combined: 0.3827, decode.acc_seg: 89.6059, decode.bin_ce_loss: 0.1125, aux.loss_ce: 0.1496, aux.acc_seg: 86.1067, loss: 0.6447
+2022-07-01 13:15:11,276 - mmseg - INFO - Iter [72700/80000]	lr: 1.248e-03, eta: 1:01:20, time: 0.397, data_time: 0.007, memory: 19739, decode.loss_ce_combined: 0.3917, decode.acc_seg: 89.4160, decode.bin_ce_loss: 0.1150, aux.loss_ce: 0.1503, aux.acc_seg: 86.1324, loss: 0.6570
+2022-07-01 13:15:51,036 - mmseg - INFO - Iter [72800/80000]	lr: 1.234e-03, eta: 1:00:24, time: 0.398, data_time: 0.006, memory: 19739, decode.loss_ce_combined: 0.3861, decode.acc_seg: 89.6400, decode.bin_ce_loss: 0.1177, aux.loss_ce: 0.1499, aux.acc_seg: 86.0100, loss: 0.6537
+2022-07-01 13:16:35,474 - mmseg - INFO - Iter [72900/80000]	lr: 1.220e-03, eta: 0:59:30, time: 0.444, data_time: 0.035, memory: 19739, decode.loss_ce_combined: 0.3642, decode.acc_seg: 90.1672, decode.bin_ce_loss: 0.1114, aux.loss_ce: 0.1459, aux.acc_seg: 86.2181, loss: 0.6215
+2022-07-01 13:17:15,031 - mmseg - INFO - Exp name: deeplabv3plus_mobilenet_multi_combined_80k.py
+2022-07-01 13:17:15,031 - mmseg - INFO - Iter [73000/80000]	lr: 1.205e-03, eta: 0:58:34, time: 0.396, data_time: 0.006, memory: 19739, decode.loss_ce_combined: 0.3765, decode.acc_seg: 89.9641, decode.bin_ce_loss: 0.1171, aux.loss_ce: 0.1466, aux.acc_seg: 86.3248, loss: 0.6402
+2022-07-01 13:17:55,161 - mmseg - INFO - Iter [73100/80000]	lr: 1.191e-03, eta: 0:57:39, time: 0.401, data_time: 0.007, memory: 19739, decode.loss_ce_combined: 0.3641, decode.acc_seg: 90.0313, decode.bin_ce_loss: 0.1092, aux.loss_ce: 0.1459, aux.acc_seg: 86.1970, loss: 0.6192
+2022-07-01 13:18:34,570 - mmseg - INFO - Iter [73200/80000]	lr: 1.177e-03, eta: 0:56:43, time: 0.394, data_time: 0.006, memory: 19739, decode.loss_ce_combined: 0.3720, decode.acc_seg: 89.9389, decode.bin_ce_loss: 0.1129, aux.loss_ce: 0.1440, aux.acc_seg: 86.3890, loss: 0.6289
+2022-07-01 13:19:19,766 - mmseg - INFO - Iter [73300/80000]	lr: 1.163e-03, eta: 0:55:51, time: 0.452, data_time: 0.043, memory: 19739, decode.loss_ce_combined: 0.3799, decode.acc_seg: 89.5380, decode.bin_ce_loss: 0.1120, aux.loss_ce: 0.1477, aux.acc_seg: 86.2476, loss: 0.6396
+2022-07-01 13:19:59,701 - mmseg - INFO - Iter [73400/80000]	lr: 1.148e-03, eta: 0:54:56, time: 0.399, data_time: 0.006, memory: 19739, decode.loss_ce_combined: 0.3740, decode.acc_seg: 90.0030, decode.bin_ce_loss: 0.1131, aux.loss_ce: 0.1456, aux.acc_seg: 86.4958, loss: 0.6328
+2022-07-01 13:20:39,702 - mmseg - INFO - Iter [73500/80000]	lr: 1.134e-03, eta: 0:54:01, time: 0.400, data_time: 0.006, memory: 19739, decode.loss_ce_combined: 0.3666, decode.acc_seg: 90.1553, decode.bin_ce_loss: 0.1107, aux.loss_ce: 0.1456, aux.acc_seg: 86.3167, loss: 0.6229
+2022-07-01 13:21:23,867 - mmseg - INFO - Iter [73600/80000]	lr: 1.120e-03, eta: 0:53:08, time: 0.442, data_time: 0.039, memory: 19739, decode.loss_ce_combined: 0.3556, decode.acc_seg: 90.1291, decode.bin_ce_loss: 0.1036, aux.loss_ce: 0.1422, aux.acc_seg: 86.6656, loss: 0.6014
+2022-07-01 13:22:04,008 - mmseg - INFO - Iter [73700/80000]	lr: 1.105e-03, eta: 0:52:14, time: 0.401, data_time: 0.006, memory: 19739, decode.loss_ce_combined: 0.3643, decode.acc_seg: 90.4848, decode.bin_ce_loss: 0.1147, aux.loss_ce: 0.1409, aux.acc_seg: 87.0785, loss: 0.6199
+2022-07-01 13:22:43,924 - mmseg - INFO - Iter [73800/80000]	lr: 1.091e-03, eta: 0:51:20, time: 0.399, data_time: 0.007, memory: 19739, decode.loss_ce_combined: 0.3596, decode.acc_seg: 90.2333, decode.bin_ce_loss: 0.1110, aux.loss_ce: 0.1417, aux.acc_seg: 86.6997, loss: 0.6123
+2022-07-01 13:23:28,015 - mmseg - INFO - Iter [73900/80000]	lr: 1.077e-03, eta: 0:50:28, time: 0.441, data_time: 0.051, memory: 19739, decode.loss_ce_combined: 0.3576, decode.acc_seg: 90.2627, decode.bin_ce_loss: 0.1057, aux.loss_ce: 0.1422, aux.acc_seg: 86.9290, loss: 0.6055
+2022-07-01 13:24:07,893 - mmseg - INFO - Exp name: deeplabv3plus_mobilenet_multi_combined_80k.py
+2022-07-01 13:24:07,893 - mmseg - INFO - Iter [74000/80000]	lr: 1.062e-03, eta: 0:49:34, time: 0.399, data_time: 0.006, memory: 19739, decode.loss_ce_combined: 0.3660, decode.acc_seg: 90.1477, decode.bin_ce_loss: 0.1117, aux.loss_ce: 0.1430, aux.acc_seg: 86.6088, loss: 0.6207
+2022-07-01 13:24:47,663 - mmseg - INFO - Iter [74100/80000]	lr: 1.048e-03, eta: 0:48:40, time: 0.398, data_time: 0.006, memory: 19739, decode.loss_ce_combined: 0.3705, decode.acc_seg: 89.7825, decode.bin_ce_loss: 0.1089, aux.loss_ce: 0.1447, aux.acc_seg: 86.6100, loss: 0.6241
+2022-07-01 13:25:32,353 - mmseg - INFO - Iter [74200/80000]	lr: 1.033e-03, eta: 0:47:49, time: 0.447, data_time: 0.040, memory: 19739, decode.loss_ce_combined: 0.3836, decode.acc_seg: 89.6673, decode.bin_ce_loss: 0.1178, aux.loss_ce: 0.1465, aux.acc_seg: 86.2054, loss: 0.6480
+2022-07-01 13:26:12,127 - mmseg - INFO - Iter [74300/80000]	lr: 1.019e-03, eta: 0:46:56, time: 0.398, data_time: 0.007, memory: 19739, decode.loss_ce_combined: 0.3642, decode.acc_seg: 90.1492, decode.bin_ce_loss: 0.1120, aux.loss_ce: 0.1450, aux.acc_seg: 86.5611, loss: 0.6213
+2022-07-01 13:26:51,768 - mmseg - INFO - Iter [74400/80000]	lr: 1.004e-03, eta: 0:46:02, time: 0.396, data_time: 0.007, memory: 19739, decode.loss_ce_combined: 0.3572, decode.acc_seg: 90.2783, decode.bin_ce_loss: 0.1066, aux.loss_ce: 0.1383, aux.acc_seg: 87.1165, loss: 0.6022
+2022-07-01 13:27:36,531 - mmseg - INFO - Iter [74500/80000]	lr: 9.897e-04, eta: 0:45:11, time: 0.448, data_time: 0.039, memory: 19739, decode.loss_ce_combined: 0.3610, decode.acc_seg: 90.4038, decode.bin_ce_loss: 0.1098, aux.loss_ce: 0.1392, aux.acc_seg: 86.9320, loss: 0.6100
+2022-07-01 13:28:16,134 - mmseg - INFO - Iter [74600/80000]	lr: 9.751e-04, eta: 0:44:18, time: 0.396, data_time: 0.007, memory: 19739, decode.loss_ce_combined: 0.3538, decode.acc_seg: 90.4611, decode.bin_ce_loss: 0.1058, aux.loss_ce: 0.1405, aux.acc_seg: 86.9598, loss: 0.6001
+2022-07-01 13:28:55,772 - mmseg - INFO - Iter [74700/80000]	lr: 9.606e-04, eta: 0:43:26, time: 0.396, data_time: 0.006, memory: 19739, decode.loss_ce_combined: 0.3356, decode.acc_seg: 90.7471, decode.bin_ce_loss: 0.0975, aux.loss_ce: 0.1363, aux.acc_seg: 87.1880, loss: 0.5694
+2022-07-01 13:29:35,301 - mmseg - INFO - Iter [74800/80000]	lr: 9.459e-04, eta: 0:42:33, time: 0.395, data_time: 0.007, memory: 19739, decode.loss_ce_combined: 0.3688, decode.acc_seg: 89.9477, decode.bin_ce_loss: 0.1096, aux.loss_ce: 0.1445, aux.acc_seg: 86.4868, loss: 0.6228
+2022-07-01 13:30:20,497 - mmseg - INFO - Iter [74900/80000]	lr: 9.313e-04, eta: 0:41:43, time: 0.452, data_time: 0.061, memory: 19739, decode.loss_ce_combined: 0.3376, decode.acc_seg: 90.9272, decode.bin_ce_loss: 0.1004, aux.loss_ce: 0.1334, aux.acc_seg: 87.5731, loss: 0.5715
+2022-07-01 13:31:00,181 - mmseg - INFO - Saving checkpoint at 75000 iterations
+2022-07-01 13:31:00,946 - mmseg - INFO - Exp name: deeplabv3plus_mobilenet_multi_combined_80k.py
+2022-07-01 13:31:00,946 - mmseg - INFO - Iter [75000/80000]	lr: 9.166e-04, eta: 0:40:51, time: 0.405, data_time: 0.007, memory: 19739, decode.loss_ce_combined: 0.3449, decode.acc_seg: 90.5618, decode.bin_ce_loss: 0.1004, aux.loss_ce: 0.1408, aux.acc_seg: 86.7975, loss: 0.5861
+2022-07-01 13:31:28,714 - mmseg - INFO - per class results:
+2022-07-01 13:31:28,714 - mmseg - INFO - 
++--------------------+-------+-------+
+|       Class        |  IoU  |  Acc  |
++--------------------+-------+-------+
+|     Background     | 91.51 | 95.36 |
+|        Meat        | 68.23 | 82.21 |
+|     Nuts/seeds     | 44.73 | 56.58 |
+|        Eggs        | 44.42 | 60.78 |
+| Beans/lentils/peas |  18.2 | 28.36 |
+|       Fruit        | 60.64 | 73.45 |
+|       Grain        | 61.69 | 76.56 |
+|     Vegetables     | 68.78 |  82.6 |
+|       Dairy        | 30.71 |  41.7 |
+|    Sauce/Spread    |  34.0 | 55.08 |
+|     Soup/Drink     | 46.93 | 60.65 |
++--------------------+-------+-------+
+2022-07-01 13:31:28,715 - mmseg - INFO - Summary:
+2022-07-01 13:31:28,715 - mmseg - INFO - 
++-------+------+-------+
+|  aAcc | mIoU |  mAcc |
++-------+------+-------+
+| 86.47 | 51.8 | 64.85 |
++-------+------+-------+
+2022-07-01 13:31:28,720 - mmseg - INFO - Exp name: deeplabv3plus_mobilenet_multi_combined_80k.py
+2022-07-01 13:31:28,720 - mmseg - INFO - Iter(val) [503]	aAcc: 0.8647, mIoU: 0.5180, mAcc: 0.6485, IoU.Background: 0.9151, IoU.Meat: 0.6823, IoU.Nuts/seeds: 0.4473, IoU.Eggs: 0.4442, IoU.Beans/lentils/peas: 0.1820, IoU.Fruit: 0.6064, IoU.Grain: 0.6169, IoU.Vegetables: 0.6878, IoU.Dairy: 0.3071, IoU.Sauce/Spread: 0.3400, IoU.Soup/Drink: 0.4693, Acc.Background: 0.9536, Acc.Meat: 0.8221, Acc.Nuts/seeds: 0.5658, Acc.Eggs: 0.6078, Acc.Beans/lentils/peas: 0.2836, Acc.Fruit: 0.7345, Acc.Grain: 0.7656, Acc.Vegetables: 0.8260, Acc.Dairy: 0.4170, Acc.Sauce/Spread: 0.5508, Acc.Soup/Drink: 0.6065
+2022-07-01 13:32:08,208 - mmseg - INFO - Iter [75100/80000]	lr: 9.019e-04, eta: 0:40:08, time: 0.673, data_time: 0.284, memory: 19739, decode.loss_ce_combined: 0.3512, decode.acc_seg: 90.4079, decode.bin_ce_loss: 0.1076, aux.loss_ce: 0.1389, aux.acc_seg: 86.8102, loss: 0.5977
+2022-07-01 13:32:52,952 - mmseg - INFO - Iter [75200/80000]	lr: 8.871e-04, eta: 0:39:17, time: 0.447, data_time: 0.053, memory: 19739, decode.loss_ce_combined: 0.3442, decode.acc_seg: 90.3788, decode.bin_ce_loss: 0.1005, aux.loss_ce: 0.1396, aux.acc_seg: 86.7571, loss: 0.5843
+2022-07-01 13:33:32,995 - mmseg - INFO - Iter [75300/80000]	lr: 8.724e-04, eta: 0:38:25, time: 0.400, data_time: 0.007, memory: 19739, decode.loss_ce_combined: 0.3491, decode.acc_seg: 90.5092, decode.bin_ce_loss: 0.1019, aux.loss_ce: 0.1406, aux.acc_seg: 86.9234, loss: 0.5916
+2022-07-01 13:34:13,291 - mmseg - INFO - Iter [75400/80000]	lr: 8.576e-04, eta: 0:37:33, time: 0.403, data_time: 0.007, memory: 19739, decode.loss_ce_combined: 0.3412, decode.acc_seg: 90.7724, decode.bin_ce_loss: 0.1044, aux.loss_ce: 0.1356, aux.acc_seg: 87.4035, loss: 0.5811
+2022-07-01 13:34:57,345 - mmseg - INFO - Iter [75500/80000]	lr: 8.427e-04, eta: 0:36:43, time: 0.441, data_time: 0.044, memory: 19739, decode.loss_ce_combined: 0.3488, decode.acc_seg: 90.4063, decode.bin_ce_loss: 0.1013, aux.loss_ce: 0.1382, aux.acc_seg: 87.1273, loss: 0.5882
+2022-07-01 13:35:37,318 - mmseg - INFO - Iter [75600/80000]	lr: 8.279e-04, eta: 0:35:52, time: 0.400, data_time: 0.006, memory: 19739, decode.loss_ce_combined: 0.3434, decode.acc_seg: 90.6533, decode.bin_ce_loss: 0.1017, aux.loss_ce: 0.1377, aux.acc_seg: 87.2069, loss: 0.5828
+2022-07-01 13:36:17,112 - mmseg - INFO - Iter [75700/80000]	lr: 8.130e-04, eta: 0:35:00, time: 0.398, data_time: 0.007, memory: 19739, decode.loss_ce_combined: 0.3297, decode.acc_seg: 91.0814, decode.bin_ce_loss: 0.0993, aux.loss_ce: 0.1319, aux.acc_seg: 87.6947, loss: 0.5609
+2022-07-01 13:37:01,481 - mmseg - INFO - Iter [75800/80000]	lr: 7.980e-04, eta: 0:34:10, time: 0.444, data_time: 0.053, memory: 19739, decode.loss_ce_combined: 0.3437, decode.acc_seg: 90.8210, decode.bin_ce_loss: 0.1037, aux.loss_ce: 0.1376, aux.acc_seg: 87.2335, loss: 0.5850
+2022-07-01 13:37:40,993 - mmseg - INFO - Iter [75900/80000]	lr: 7.831e-04, eta: 0:33:19, time: 0.395, data_time: 0.006, memory: 19739, decode.loss_ce_combined: 0.3394, decode.acc_seg: 90.7158, decode.bin_ce_loss: 0.0992, aux.loss_ce: 0.1370, aux.acc_seg: 87.2141, loss: 0.5756
+2022-07-01 13:38:21,056 - mmseg - INFO - Exp name: deeplabv3plus_mobilenet_multi_combined_80k.py
+2022-07-01 13:38:21,056 - mmseg - INFO - Iter [76000/80000]	lr: 7.680e-04, eta: 0:32:28, time: 0.401, data_time: 0.007, memory: 19739, decode.loss_ce_combined: 0.3224, decode.acc_seg: 91.1646, decode.bin_ce_loss: 0.0949, aux.loss_ce: 0.1318, aux.acc_seg: 87.5769, loss: 0.5491
+2022-07-01 13:39:04,966 - mmseg - INFO - Iter [76100/80000]	lr: 7.530e-04, eta: 0:31:38, time: 0.439, data_time: 0.042, memory: 19739, decode.loss_ce_combined: 0.3419, decode.acc_seg: 90.7118, decode.bin_ce_loss: 0.1052, aux.loss_ce: 0.1358, aux.acc_seg: 87.1893, loss: 0.5829
+2022-07-01 13:39:44,662 - mmseg - INFO - Iter [76200/80000]	lr: 7.379e-04, eta: 0:30:47, time: 0.397, data_time: 0.007, memory: 19739, decode.loss_ce_combined: 0.3414, decode.acc_seg: 90.5094, decode.bin_ce_loss: 0.1002, aux.loss_ce: 0.1378, aux.acc_seg: 87.0031, loss: 0.5794
+2022-07-01 13:40:24,471 - mmseg - INFO - Iter [76300/80000]	lr: 7.228e-04, eta: 0:29:57, time: 0.398, data_time: 0.006, memory: 19739, decode.loss_ce_combined: 0.3398, decode.acc_seg: 90.6286, decode.bin_ce_loss: 0.1013, aux.loss_ce: 0.1342, aux.acc_seg: 87.3219, loss: 0.5753
+2022-07-01 13:41:04,179 - mmseg - INFO - Iter [76400/80000]	lr: 7.076e-04, eta: 0:29:06, time: 0.397, data_time: 0.006, memory: 19739, decode.loss_ce_combined: 0.3384, decode.acc_seg: 90.6011, decode.bin_ce_loss: 0.0971, aux.loss_ce: 0.1364, aux.acc_seg: 87.3713, loss: 0.5719
+2022-07-01 13:41:48,194 - mmseg - INFO - Iter [76500/80000]	lr: 6.924e-04, eta: 0:28:17, time: 0.440, data_time: 0.029, memory: 19739, decode.loss_ce_combined: 0.3414, decode.acc_seg: 90.6951, decode.bin_ce_loss: 0.1016, aux.loss_ce: 0.1357, aux.acc_seg: 87.2776, loss: 0.5787
+2022-07-01 13:42:28,358 - mmseg - INFO - Iter [76600/80000]	lr: 6.772e-04, eta: 0:27:26, time: 0.402, data_time: 0.007, memory: 19739, decode.loss_ce_combined: 0.3407, decode.acc_seg: 90.7457, decode.bin_ce_loss: 0.1023, aux.loss_ce: 0.1355, aux.acc_seg: 87.2232, loss: 0.5784
+2022-07-01 13:43:08,105 - mmseg - INFO - Iter [76700/80000]	lr: 6.619e-04, eta: 0:26:36, time: 0.397, data_time: 0.007, memory: 19739, decode.loss_ce_combined: 0.3398, decode.acc_seg: 90.6839, decode.bin_ce_loss: 0.1022, aux.loss_ce: 0.1345, aux.acc_seg: 87.2225, loss: 0.5765
+2022-07-01 13:43:52,530 - mmseg - INFO - Iter [76800/80000]	lr: 6.465e-04, eta: 0:25:47, time: 0.444, data_time: 0.036, memory: 19739, decode.loss_ce_combined: 0.3290, decode.acc_seg: 91.1607, decode.bin_ce_loss: 0.0996, aux.loss_ce: 0.1326, aux.acc_seg: 87.5312, loss: 0.5612
+2022-07-01 13:44:32,418 - mmseg - INFO - Iter [76900/80000]	lr: 6.311e-04, eta: 0:24:57, time: 0.399, data_time: 0.006, memory: 19739, decode.loss_ce_combined: 0.3412, decode.acc_seg: 90.5740, decode.bin_ce_loss: 0.0998, aux.loss_ce: 0.1366, aux.acc_seg: 87.1384, loss: 0.5776
+2022-07-01 13:45:12,019 - mmseg - INFO - Exp name: deeplabv3plus_mobilenet_multi_combined_80k.py
+2022-07-01 13:45:12,019 - mmseg - INFO - Iter [77000/80000]	lr: 6.157e-04, eta: 0:24:07, time: 0.396, data_time: 0.007, memory: 19739, decode.loss_ce_combined: 0.3214, decode.acc_seg: 91.2267, decode.bin_ce_loss: 0.0947, aux.loss_ce: 0.1324, aux.acc_seg: 87.6305, loss: 0.5484
+2022-07-01 13:45:56,770 - mmseg - INFO - Iter [77100/80000]	lr: 6.002e-04, eta: 0:23:19, time: 0.448, data_time: 0.060, memory: 19739, decode.loss_ce_combined: 0.3154, decode.acc_seg: 91.4388, decode.bin_ce_loss: 0.0927, aux.loss_ce: 0.1308, aux.acc_seg: 87.8372, loss: 0.5389
+2022-07-01 13:46:36,389 - mmseg - INFO - Iter [77200/80000]	lr: 5.847e-04, eta: 0:22:29, time: 0.396, data_time: 0.006, memory: 19739, decode.loss_ce_combined: 0.3206, decode.acc_seg: 91.1083, decode.bin_ce_loss: 0.0946, aux.loss_ce: 0.1310, aux.acc_seg: 87.5000, loss: 0.5463
+2022-07-01 13:47:16,062 - mmseg - INFO - Iter [77300/80000]	lr: 5.691e-04, eta: 0:21:39, time: 0.397, data_time: 0.007, memory: 19739, decode.loss_ce_combined: 0.3288, decode.acc_seg: 91.0978, decode.bin_ce_loss: 0.0967, aux.loss_ce: 0.1324, aux.acc_seg: 87.7367, loss: 0.5579
+2022-07-01 13:48:00,771 - mmseg - INFO - Iter [77400/80000]	lr: 5.534e-04, eta: 0:20:51, time: 0.447, data_time: 0.041, memory: 19739, decode.loss_ce_combined: 0.3359, decode.acc_seg: 90.9376, decode.bin_ce_loss: 0.1022, aux.loss_ce: 0.1366, aux.acc_seg: 87.3051, loss: 0.5746
+2022-07-01 13:48:40,289 - mmseg - INFO - Iter [77500/80000]	lr: 5.377e-04, eta: 0:20:01, time: 0.395, data_time: 0.007, memory: 19739, decode.loss_ce_combined: 0.2986, decode.acc_seg: 91.9058, decode.bin_ce_loss: 0.0914, aux.loss_ce: 0.1240, aux.acc_seg: 88.2537, loss: 0.5141
+2022-07-01 13:49:20,348 - mmseg - INFO - Iter [77600/80000]	lr: 5.219e-04, eta: 0:19:12, time: 0.401, data_time: 0.006, memory: 19739, decode.loss_ce_combined: 0.3294, decode.acc_seg: 91.0639, decode.bin_ce_loss: 0.0994, aux.loss_ce: 0.1309, aux.acc_seg: 87.8452, loss: 0.5597
+2022-07-01 13:49:59,746 - mmseg - INFO - Iter [77700/80000]	lr: 5.060e-04, eta: 0:18:23, time: 0.394, data_time: 0.006, memory: 19739, decode.loss_ce_combined: 0.3211, decode.acc_seg: 91.3566, decode.bin_ce_loss: 0.0985, aux.loss_ce: 0.1272, aux.acc_seg: 88.1053, loss: 0.5469
+2022-07-01 13:50:44,503 - mmseg - INFO - Iter [77800/80000]	lr: 4.901e-04, eta: 0:17:35, time: 0.448, data_time: 0.040, memory: 19739, decode.loss_ce_combined: 0.3181, decode.acc_seg: 91.2865, decode.bin_ce_loss: 0.0934, aux.loss_ce: 0.1315, aux.acc_seg: 87.7923, loss: 0.5429
+2022-07-01 13:51:24,193 - mmseg - INFO - Iter [77900/80000]	lr: 4.741e-04, eta: 0:16:46, time: 0.397, data_time: 0.006, memory: 19739, decode.loss_ce_combined: 0.3241, decode.acc_seg: 91.2846, decode.bin_ce_loss: 0.0991, aux.loss_ce: 0.1294, aux.acc_seg: 87.8540, loss: 0.5526
+2022-07-01 13:52:04,282 - mmseg - INFO - Exp name: deeplabv3plus_mobilenet_multi_combined_80k.py
+2022-07-01 13:52:04,283 - mmseg - INFO - Iter [78000/80000]	lr: 4.581e-04, eta: 0:15:57, time: 0.401, data_time: 0.006, memory: 19739, decode.loss_ce_combined: 0.3211, decode.acc_seg: 91.0914, decode.bin_ce_loss: 0.0939, aux.loss_ce: 0.1315, aux.acc_seg: 87.7734, loss: 0.5465
+2022-07-01 13:52:48,929 - mmseg - INFO - Iter [78100/80000]	lr: 4.419e-04, eta: 0:15:09, time: 0.446, data_time: 0.055, memory: 19739, decode.loss_ce_combined: 0.3040, decode.acc_seg: 91.7043, decode.bin_ce_loss: 0.0880, aux.loss_ce: 0.1260, aux.acc_seg: 88.2103, loss: 0.5180
+2022-07-01 13:53:29,008 - mmseg - INFO - Iter [78200/80000]	lr: 4.257e-04, eta: 0:14:20, time: 0.401, data_time: 0.006, memory: 19739, decode.loss_ce_combined: 0.3142, decode.acc_seg: 91.3075, decode.bin_ce_loss: 0.0898, aux.loss_ce: 0.1320, aux.acc_seg: 87.6514, loss: 0.5359
+2022-07-01 13:54:08,807 - mmseg - INFO - Iter [78300/80000]	lr: 4.094e-04, eta: 0:13:32, time: 0.398, data_time: 0.007, memory: 19739, decode.loss_ce_combined: 0.3158, decode.acc_seg: 91.3554, decode.bin_ce_loss: 0.0923, aux.loss_ce: 0.1311, aux.acc_seg: 87.7203, loss: 0.5392
+2022-07-01 13:54:53,864 - mmseg - INFO - Iter [78400/80000]	lr: 3.930e-04, eta: 0:12:44, time: 0.451, data_time: 0.052, memory: 19739, decode.loss_ce_combined: 0.3097, decode.acc_seg: 91.6993, decode.bin_ce_loss: 0.0952, aux.loss_ce: 0.1245, aux.acc_seg: 88.4013, loss: 0.5294
+2022-07-01 13:55:33,771 - mmseg - INFO - Iter [78500/80000]	lr: 3.764e-04, eta: 0:11:55, time: 0.399, data_time: 0.006, memory: 19739, decode.loss_ce_combined: 0.3046, decode.acc_seg: 91.5564, decode.bin_ce_loss: 0.0893, aux.loss_ce: 0.1246, aux.acc_seg: 88.1602, loss: 0.5185
+2022-07-01 13:56:13,728 - mmseg - INFO - Iter [78600/80000]	lr: 3.598e-04, eta: 0:11:07, time: 0.400, data_time: 0.007, memory: 19739, decode.loss_ce_combined: 0.3095, decode.acc_seg: 91.4884, decode.bin_ce_loss: 0.0919, aux.loss_ce: 0.1301, aux.acc_seg: 87.7197, loss: 0.5315
+2022-07-01 13:56:58,287 - mmseg - INFO - Iter [78700/80000]	lr: 3.431e-04, eta: 0:10:19, time: 0.446, data_time: 0.034, memory: 19739, decode.loss_ce_combined: 0.2973, decode.acc_seg: 91.8099, decode.bin_ce_loss: 0.0884, aux.loss_ce: 0.1225, aux.acc_seg: 88.7040, loss: 0.5082
+2022-07-01 13:57:37,810 - mmseg - INFO - Iter [78800/80000]	lr: 3.262e-04, eta: 0:09:31, time: 0.395, data_time: 0.006, memory: 19739, decode.loss_ce_combined: 0.3116, decode.acc_seg: 91.4576, decode.bin_ce_loss: 0.0909, aux.loss_ce: 0.1286, aux.acc_seg: 88.0514, loss: 0.5311
+2022-07-01 13:58:17,468 - mmseg - INFO - Iter [78900/80000]	lr: 3.092e-04, eta: 0:08:43, time: 0.397, data_time: 0.007, memory: 19739, decode.loss_ce_combined: 0.3067, decode.acc_seg: 91.5769, decode.bin_ce_loss: 0.0900, aux.loss_ce: 0.1250, aux.acc_seg: 88.3786, loss: 0.5218
+2022-07-01 13:59:01,991 - mmseg - INFO - Exp name: deeplabv3plus_mobilenet_multi_combined_80k.py
+2022-07-01 13:59:01,991 - mmseg - INFO - Iter [79000/80000]	lr: 2.920e-04, eta: 0:07:55, time: 0.445, data_time: 0.037, memory: 19739, decode.loss_ce_combined: 0.2984, decode.acc_seg: 91.8109, decode.bin_ce_loss: 0.0894, aux.loss_ce: 0.1238, aux.acc_seg: 88.3159, loss: 0.5117
+2022-07-01 13:59:41,201 - mmseg - INFO - Iter [79100/80000]	lr: 2.746e-04, eta: 0:07:07, time: 0.392, data_time: 0.007, memory: 19739, decode.loss_ce_combined: 0.3017, decode.acc_seg: 91.7278, decode.bin_ce_loss: 0.0878, aux.loss_ce: 0.1262, aux.acc_seg: 88.2197, loss: 0.5157
+2022-07-01 14:00:20,958 - mmseg - INFO - Iter [79200/80000]	lr: 2.571e-04, eta: 0:06:19, time: 0.398, data_time: 0.007, memory: 19739, decode.loss_ce_combined: 0.2953, decode.acc_seg: 91.8752, decode.bin_ce_loss: 0.0880, aux.loss_ce: 0.1217, aux.acc_seg: 88.6527, loss: 0.5050
+2022-07-01 14:01:00,352 - mmseg - INFO - Iter [79300/80000]	lr: 2.393e-04, eta: 0:05:31, time: 0.394, data_time: 0.007, memory: 19739, decode.loss_ce_combined: 0.3064, decode.acc_seg: 91.6570, decode.bin_ce_loss: 0.0913, aux.loss_ce: 0.1270, aux.acc_seg: 88.2414, loss: 0.5247
+2022-07-01 14:01:44,516 - mmseg - INFO - Iter [79400/80000]	lr: 2.213e-04, eta: 0:04:44, time: 0.442, data_time: 0.037, memory: 19739, decode.loss_ce_combined: 0.3041, decode.acc_seg: 91.7564, decode.bin_ce_loss: 0.0919, aux.loss_ce: 0.1248, aux.acc_seg: 88.2737, loss: 0.5209
+2022-07-01 14:02:24,659 - mmseg - INFO - Iter [79500/80000]	lr: 2.030e-04, eta: 0:03:56, time: 0.401, data_time: 0.007, memory: 19739, decode.loss_ce_combined: 0.2970, decode.acc_seg: 91.8540, decode.bin_ce_loss: 0.0873, aux.loss_ce: 0.1239, aux.acc_seg: 88.4758, loss: 0.5081
+2022-07-01 14:03:04,375 - mmseg - INFO - Iter [79600/80000]	lr: 1.843e-04, eta: 0:03:09, time: 0.397, data_time: 0.007, memory: 19739, decode.loss_ce_combined: 0.2967, decode.acc_seg: 91.7918, decode.bin_ce_loss: 0.0871, aux.loss_ce: 0.1236, aux.acc_seg: 88.3846, loss: 0.5074
+2022-07-01 14:03:48,872 - mmseg - INFO - Iter [79700/80000]	lr: 1.651e-04, eta: 0:02:21, time: 0.445, data_time: 0.042, memory: 19739, decode.loss_ce_combined: 0.2914, decode.acc_seg: 91.9399, decode.bin_ce_loss: 0.0854, aux.loss_ce: 0.1202, aux.acc_seg: 88.7620, loss: 0.4970
+2022-07-01 14:04:28,409 - mmseg - INFO - Iter [79800/80000]	lr: 1.453e-04, eta: 0:01:34, time: 0.395, data_time: 0.007, memory: 19739, decode.loss_ce_combined: 0.3043, decode.acc_seg: 91.5460, decode.bin_ce_loss: 0.0855, aux.loss_ce: 0.1269, aux.acc_seg: 88.0944, loss: 0.5167
+2022-07-01 14:05:08,260 - mmseg - INFO - Iter [79900/80000]	lr: 1.244e-04, eta: 0:00:47, time: 0.399, data_time: 0.007, memory: 19739, decode.loss_ce_combined: 0.2897, decode.acc_seg: 92.0806, decode.bin_ce_loss: 0.0856, aux.loss_ce: 0.1230, aux.acc_seg: 88.5669, loss: 0.4983
+2022-07-01 14:05:52,533 - mmseg - INFO - Saving checkpoint at 80000 iterations
+2022-07-01 14:05:53,308 - mmseg - INFO - Exp name: deeplabv3plus_mobilenet_multi_combined_80k.py
+2022-07-01 14:05:53,308 - mmseg - INFO - Iter [80000/80000]	lr: 1.004e-04, eta: 0:00:00, time: 0.450, data_time: 0.036, memory: 19739, decode.loss_ce_combined: 0.3010, decode.acc_seg: 91.5668, decode.bin_ce_loss: 0.0853, aux.loss_ce: 0.1264, aux.acc_seg: 88.2233, loss: 0.5127
+2022-07-01 14:06:20,985 - mmseg - INFO - per class results:
+2022-07-01 14:06:20,986 - mmseg - INFO - 
++--------------------+-------+-------+
+|       Class        |  IoU  |  Acc  |
++--------------------+-------+-------+
+|     Background     | 91.73 | 95.64 |
+|        Meat        | 69.66 | 82.75 |
+|     Nuts/seeds     | 48.12 | 65.28 |
+|        Eggs        | 44.26 | 59.72 |
+| Beans/lentils/peas |  17.2 | 22.96 |
+|       Fruit        | 61.05 | 72.63 |
+|       Grain        | 62.12 | 75.49 |
+|     Vegetables     | 70.22 | 85.08 |
+|       Dairy        | 34.16 | 50.52 |
+|    Sauce/Spread    |  34.2 | 44.79 |
+|     Soup/Drink     | 46.33 | 63.66 |
++--------------------+-------+-------+
+2022-07-01 14:06:20,986 - mmseg - INFO - Summary:
+2022-07-01 14:06:20,986 - mmseg - INFO - 
++-------+-------+-------+
+|  aAcc |  mIoU |  mAcc |
++-------+-------+-------+
+| 86.99 | 52.64 | 65.32 |
++-------+-------+-------+
+2022-07-01 14:06:20,991 - mmseg - INFO - Exp name: deeplabv3plus_mobilenet_multi_combined_80k.py
+2022-07-01 14:06:20,991 - mmseg - INFO - Iter(val) [503]	aAcc: 0.8699, mIoU: 0.5264, mAcc: 0.6532, IoU.Background: 0.9173, IoU.Meat: 0.6966, IoU.Nuts/seeds: 0.4812, IoU.Eggs: 0.4426, IoU.Beans/lentils/peas: 0.1720, IoU.Fruit: 0.6105, IoU.Grain: 0.6212, IoU.Vegetables: 0.7022, IoU.Dairy: 0.3416, IoU.Sauce/Spread: 0.3420, IoU.Soup/Drink: 0.4633, Acc.Background: 0.9564, Acc.Meat: 0.8275, Acc.Nuts/seeds: 0.6528, Acc.Eggs: 0.5972, Acc.Beans/lentils/peas: 0.2296, Acc.Fruit: 0.7263, Acc.Grain: 0.7549, Acc.Vegetables: 0.8508, Acc.Dairy: 0.5052, Acc.Sauce/Spread: 0.4479, Acc.Soup/Drink: 0.6366

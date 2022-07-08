@@ -10,8 +10,7 @@ from .multi_label import MultiLabelDataset
 @DATASETS.register_module()
 class FoodSeg103(MultiLabelDataset):
 
-    CLASSES = ("Meat", "Nuts/seeds", "Eggs", "Beans/lentils/peas", "Fruit", "Grain", "Vegetables", "Dairy", "Dessert", "Sauce/Spread", "Soup", "Drink")
-
+    CLASSES = ("Meat", "Nuts/seeds", "Eggs", "Beans/lentils/peas", "Fruit", "Grain", "Vegetables", "Dairy", "Sauce/Spread", "Soup/Drink")
 
     def __init__(self, **kwargs):
         super(FoodSeg103, self).__init__(**kwargs)
@@ -20,7 +19,7 @@ class FoodSeg103(MultiLabelDataset):
         """Load annotations.
 
         Returns:
-            list[dict]: Annotation info from XML file.
+            list[dict]: Annotation info from CSV file
         """
         data_infos = []
         img_ids = mmcv.list_from_file(self.ann_file)

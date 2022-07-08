@@ -93,7 +93,8 @@ model = dict(
         arch='large',
         init_cfg=dict(
             type='Pretrained',
-            checkpoint='./work_dirs/mobile_v3_l_4xb16_foodseg103/latest.pth',
+            checkpoint=
+            'https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth',
             prefix='backbone')),
     neck=dict(type='GlobalAveragePooling'),
     head=dict(
