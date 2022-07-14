@@ -1,0 +1,674 @@
+2022-07-05 10:35:52,576 - mmcls - INFO - Environment info:
+------------------------------------------------------------
+sys.platform: linux
+Python: 3.8.13 (default, Mar 28 2022, 11:38:47) [GCC 7.5.0]
+CUDA available: True
+GPU 0: NVIDIA TITAN V
+GPU 1: Quadro P6000
+GPU 2,3: NVIDIA TITAN X (Pascal)
+CUDA_HOME: /usr/local/cuda
+NVCC: Cuda compilation tools, release 11.7, V11.7.64
+GCC: gcc (Ubuntu 9.4.0-1ubuntu1~20.04.1) 9.4.0
+PyTorch: 1.10.0
+PyTorch compiling details: PyTorch built with:
+  - GCC 7.3
+  - C++ Version: 201402
+  - Intel(R) oneAPI Math Kernel Library Version 2021.4-Product Build 20210904 for Intel(R) 64 architecture applications
+  - Intel(R) MKL-DNN v2.2.3 (Git Hash 7336ca9f055cf1bfa13efb658fe15dc9b41f0740)
+  - OpenMP 201511 (a.k.a. OpenMP 4.5)
+  - LAPACK is enabled (usually provided by MKL)
+  - NNPACK is enabled
+  - CPU capability usage: AVX2
+  - CUDA Runtime 11.3
+  - NVCC architecture flags: -gencode;arch=compute_37,code=sm_37;-gencode;arch=compute_50,code=sm_50;-gencode;arch=compute_60,code=sm_60;-gencode;arch=compute_61,code=sm_61;-gencode;arch=compute_70,code=sm_70;-gencode;arch=compute_75,code=sm_75;-gencode;arch=compute_80,code=sm_80;-gencode;arch=compute_86,code=sm_86;-gencode;arch=compute_37,code=compute_37
+  - CuDNN 8.2
+  - Magma 2.5.2
+  - Build settings: BLAS_INFO=mkl, BUILD_TYPE=Release, CUDA_VERSION=11.3, CUDNN_VERSION=8.2.0, CXX_COMPILER=/opt/rh/devtoolset-7/root/usr/bin/c++, CXX_FLAGS= -Wno-deprecated -fvisibility-inlines-hidden -DUSE_PTHREADPOOL -fopenmp -DNDEBUG -DUSE_KINETO -DUSE_FBGEMM -DUSE_QNNPACK -DUSE_PYTORCH_QNNPACK -DUSE_XNNPACK -DSYMBOLICATE_MOBILE_DEBUG_HANDLE -DEDGE_PROFILER_USE_KINETO -O2 -fPIC -Wno-narrowing -Wall -Wextra -Werror=return-type -Wno-missing-field-initializers -Wno-type-limits -Wno-array-bounds -Wno-unknown-pragmas -Wno-sign-compare -Wno-unused-parameter -Wno-unused-variable -Wno-unused-function -Wno-unused-result -Wno-unused-local-typedefs -Wno-strict-overflow -Wno-strict-aliasing -Wno-error=deprecated-declarations -Wno-stringop-overflow -Wno-psabi -Wno-error=pedantic -Wno-error=redundant-decls -Wno-error=old-style-cast -fdiagnostics-color=always -faligned-new -Wno-unused-but-set-variable -Wno-maybe-uninitialized -fno-math-errno -fno-trapping-math -Werror=format -Wno-stringop-overflow, LAPACK_INFO=mkl, PERF_WITH_AVX=1, PERF_WITH_AVX2=1, PERF_WITH_AVX512=1, TORCH_VERSION=1.10.0, USE_CUDA=ON, USE_CUDNN=ON, USE_EXCEPTION_PTR=1, USE_GFLAGS=OFF, USE_GLOG=OFF, USE_MKL=ON, USE_MKLDNN=ON, USE_MPI=OFF, USE_NCCL=ON, USE_NNPACK=ON, USE_OPENMP=ON, 
+
+TorchVision: 0.11.0
+OpenCV: 4.6.0
+MMCV: 1.5.3
+MMCV Compiler: GCC 7.3
+MMCV CUDA Compiler: 11.3
+MMClassification: 0.23.1+8825083
+------------------------------------------------------------
+
+2022-07-05 10:35:52,577 - mmcls - INFO - Distributed training: True
+2022-07-05 10:35:52,966 - mmcls - INFO - Config:
+dataset_type = 'FoodSeg103'
+img_norm_cfg = dict(
+    mean=[123.675, 116.28, 103.53], std=[58.395, 57.12, 57.375], to_rgb=True)
+train_pipeline = [
+    dict(type='LoadImageFromFile'),
+    dict(type='RandomResizedCrop', size=224),
+    dict(type='RandomFlip', flip_prob=0.5, direction='horizontal'),
+    dict(
+        type='Normalize',
+        mean=[123.675, 116.28, 103.53],
+        std=[58.395, 57.12, 57.375],
+        to_rgb=True),
+    dict(type='ImageToTensor', keys=['img']),
+    dict(type='ToTensor', keys=['gt_label']),
+    dict(type='Collect', keys=['img', 'gt_label'])
+]
+test_pipeline = [
+    dict(type='LoadImageFromFile'),
+    dict(type='Resize', size=(256, -1)),
+    dict(type='CenterCrop', crop_size=224),
+    dict(
+        type='Normalize',
+        mean=[123.675, 116.28, 103.53],
+        std=[58.395, 57.12, 57.375],
+        to_rgb=True),
+    dict(type='ImageToTensor', keys=['img']),
+    dict(type='Collect', keys=['img'])
+]
+data = dict(
+    samples_per_gpu=16,
+    workers_per_gpu=4,
+    train=dict(
+        type='FoodSeg103',
+        data_prefix='FoodSeg103Classification/data',
+        ann_file='FoodSeg103Classification/data/train.txt',
+        pipeline=[
+            dict(type='LoadImageFromFile'),
+            dict(type='RandomResizedCrop', size=224),
+            dict(type='RandomFlip', flip_prob=0.5, direction='horizontal'),
+            dict(
+                type='Normalize',
+                mean=[123.675, 116.28, 103.53],
+                std=[58.395, 57.12, 57.375],
+                to_rgb=True),
+            dict(type='ImageToTensor', keys=['img']),
+            dict(type='ToTensor', keys=['gt_label']),
+            dict(type='Collect', keys=['img', 'gt_label'])
+        ]),
+    val=dict(
+        type='FoodSeg103',
+        data_prefix='FoodSeg103Classification/data',
+        ann_file='FoodSeg103Classification/data/test.txt',
+        pipeline=[
+            dict(type='LoadImageFromFile'),
+            dict(type='Resize', size=(256, -1)),
+            dict(type='CenterCrop', crop_size=224),
+            dict(
+                type='Normalize',
+                mean=[123.675, 116.28, 103.53],
+                std=[58.395, 57.12, 57.375],
+                to_rgb=True),
+            dict(type='ImageToTensor', keys=['img']),
+            dict(type='Collect', keys=['img'])
+        ]),
+    test=dict(
+        type='FoodSeg103',
+        data_prefix='FoodSeg103Classification/data',
+        ann_file='FoodSeg103Classification/data/test.txt',
+        pipeline=[
+            dict(type='LoadImageFromFile'),
+            dict(type='Resize', size=(256, -1)),
+            dict(type='CenterCrop', crop_size=224),
+            dict(
+                type='Normalize',
+                mean=[123.675, 116.28, 103.53],
+                std=[58.395, 57.12, 57.375],
+                to_rgb=True),
+            dict(type='ImageToTensor', keys=['img']),
+            dict(type='Collect', keys=['img'])
+        ]))
+evaluation = dict(interval=1, metric=['mAP', 'ACC'])
+checkpoint_config = dict(interval=10)
+log_config = dict(interval=10, hooks=[dict(type='TextLoggerHook')])
+dist_params = dict(backend='nccl')
+log_level = 'INFO'
+load_from = None
+resume_from = None
+workflow = [('train', 1)]
+model = dict(
+    type='ImageClassifier',
+    backbone=dict(
+        type='MobileNetV3',
+        arch='large',
+        init_cfg=dict(
+            type='Pretrained',
+            checkpoint=
+            'https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth',
+            prefix='backbone')),
+    neck=dict(type='GlobalAveragePooling'),
+    head=dict(
+        type='MultiLabelLinearClsHead',
+        num_classes=12,
+        in_channels=960,
+        loss=dict(type='CrossEntropyLoss', loss_weight=1.0, use_sigmoid=True)))
+optimizer = dict(
+    type='SGD',
+    lr=0.001,
+    momentum=0.9,
+    weight_decay=0,
+    paramwise_cfg=dict(
+        custom_keys=dict({'.backbone.classifier': dict(lr_mult=10)})))
+optimizer_config = dict(grad_clip=None)
+lr_config = dict(policy='step', step=20, gamma=0.1)
+runner = dict(type='EpochBasedRunner', max_epochs=40)
+work_dir = './work_dirs/mobile_v3_l_4xb16_combined'
+gpu_ids = range(0, 4)
+
+2022-07-05 10:36:02,436 - mmcls - INFO - Set random seed to 1359318295, deterministic: False
+2022-07-05 10:36:02,553 - mmcls - INFO - initialize MobileNetV3 with init_cfg {'type': 'Pretrained', 'checkpoint': 'https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth', 'prefix': 'backbone'}
+2022-07-05 10:36:02,869 - mmcls - INFO - initialize MultiLabelLinearClsHead with init_cfg {'type': 'Normal', 'layer': 'Linear', 'std': 0.01}
+Name of parameter - Initialization information
+
+backbone.layer0.conv.weight - torch.Size([16, 3, 3, 3]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer0.bn.weight - torch.Size([16]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer0.bn.bias - torch.Size([16]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer1.depthwise_conv.conv.weight - torch.Size([16, 1, 3, 3]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer1.depthwise_conv.bn.weight - torch.Size([16]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer1.depthwise_conv.bn.bias - torch.Size([16]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer1.linear_conv.conv.weight - torch.Size([16, 16, 1, 1]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer1.linear_conv.bn.weight - torch.Size([16]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer1.linear_conv.bn.bias - torch.Size([16]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer2.expand_conv.conv.weight - torch.Size([64, 16, 1, 1]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer2.expand_conv.bn.weight - torch.Size([64]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer2.expand_conv.bn.bias - torch.Size([64]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer2.depthwise_conv.conv.weight - torch.Size([64, 1, 3, 3]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer2.depthwise_conv.bn.weight - torch.Size([64]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer2.depthwise_conv.bn.bias - torch.Size([64]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer2.linear_conv.conv.weight - torch.Size([24, 64, 1, 1]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer2.linear_conv.bn.weight - torch.Size([24]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer2.linear_conv.bn.bias - torch.Size([24]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer3.expand_conv.conv.weight - torch.Size([72, 24, 1, 1]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer3.expand_conv.bn.weight - torch.Size([72]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer3.expand_conv.bn.bias - torch.Size([72]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer3.depthwise_conv.conv.weight - torch.Size([72, 1, 3, 3]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer3.depthwise_conv.bn.weight - torch.Size([72]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer3.depthwise_conv.bn.bias - torch.Size([72]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer3.linear_conv.conv.weight - torch.Size([24, 72, 1, 1]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer3.linear_conv.bn.weight - torch.Size([24]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer3.linear_conv.bn.bias - torch.Size([24]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer4.expand_conv.conv.weight - torch.Size([72, 24, 1, 1]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer4.expand_conv.bn.weight - torch.Size([72]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer4.expand_conv.bn.bias - torch.Size([72]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer4.depthwise_conv.conv.weight - torch.Size([72, 1, 5, 5]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer4.depthwise_conv.bn.weight - torch.Size([72]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer4.depthwise_conv.bn.bias - torch.Size([72]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer4.se.conv1.conv.weight - torch.Size([24, 72, 1, 1]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer4.se.conv1.conv.bias - torch.Size([24]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer4.se.conv2.conv.weight - torch.Size([72, 24, 1, 1]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer4.se.conv2.conv.bias - torch.Size([72]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer4.linear_conv.conv.weight - torch.Size([40, 72, 1, 1]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer4.linear_conv.bn.weight - torch.Size([40]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer4.linear_conv.bn.bias - torch.Size([40]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer5.expand_conv.conv.weight - torch.Size([120, 40, 1, 1]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer5.expand_conv.bn.weight - torch.Size([120]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer5.expand_conv.bn.bias - torch.Size([120]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer5.depthwise_conv.conv.weight - torch.Size([120, 1, 5, 5]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer5.depthwise_conv.bn.weight - torch.Size([120]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer5.depthwise_conv.bn.bias - torch.Size([120]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer5.se.conv1.conv.weight - torch.Size([32, 120, 1, 1]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer5.se.conv1.conv.bias - torch.Size([32]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer5.se.conv2.conv.weight - torch.Size([120, 32, 1, 1]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer5.se.conv2.conv.bias - torch.Size([120]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer5.linear_conv.conv.weight - torch.Size([40, 120, 1, 1]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer5.linear_conv.bn.weight - torch.Size([40]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer5.linear_conv.bn.bias - torch.Size([40]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer6.expand_conv.conv.weight - torch.Size([120, 40, 1, 1]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer6.expand_conv.bn.weight - torch.Size([120]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer6.expand_conv.bn.bias - torch.Size([120]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer6.depthwise_conv.conv.weight - torch.Size([120, 1, 5, 5]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer6.depthwise_conv.bn.weight - torch.Size([120]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer6.depthwise_conv.bn.bias - torch.Size([120]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer6.se.conv1.conv.weight - torch.Size([32, 120, 1, 1]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer6.se.conv1.conv.bias - torch.Size([32]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer6.se.conv2.conv.weight - torch.Size([120, 32, 1, 1]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer6.se.conv2.conv.bias - torch.Size([120]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer6.linear_conv.conv.weight - torch.Size([40, 120, 1, 1]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer6.linear_conv.bn.weight - torch.Size([40]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer6.linear_conv.bn.bias - torch.Size([40]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer7.expand_conv.conv.weight - torch.Size([240, 40, 1, 1]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer7.expand_conv.bn.weight - torch.Size([240]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer7.expand_conv.bn.bias - torch.Size([240]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer7.depthwise_conv.conv.weight - torch.Size([240, 1, 3, 3]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer7.depthwise_conv.bn.weight - torch.Size([240]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer7.depthwise_conv.bn.bias - torch.Size([240]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer7.linear_conv.conv.weight - torch.Size([80, 240, 1, 1]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer7.linear_conv.bn.weight - torch.Size([80]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer7.linear_conv.bn.bias - torch.Size([80]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer8.expand_conv.conv.weight - torch.Size([200, 80, 1, 1]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer8.expand_conv.bn.weight - torch.Size([200]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer8.expand_conv.bn.bias - torch.Size([200]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer8.depthwise_conv.conv.weight - torch.Size([200, 1, 3, 3]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer8.depthwise_conv.bn.weight - torch.Size([200]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer8.depthwise_conv.bn.bias - torch.Size([200]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer8.linear_conv.conv.weight - torch.Size([80, 200, 1, 1]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer8.linear_conv.bn.weight - torch.Size([80]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer8.linear_conv.bn.bias - torch.Size([80]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer9.expand_conv.conv.weight - torch.Size([184, 80, 1, 1]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer9.expand_conv.bn.weight - torch.Size([184]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer9.expand_conv.bn.bias - torch.Size([184]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer9.depthwise_conv.conv.weight - torch.Size([184, 1, 3, 3]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer9.depthwise_conv.bn.weight - torch.Size([184]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer9.depthwise_conv.bn.bias - torch.Size([184]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer9.linear_conv.conv.weight - torch.Size([80, 184, 1, 1]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer9.linear_conv.bn.weight - torch.Size([80]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer9.linear_conv.bn.bias - torch.Size([80]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer10.expand_conv.conv.weight - torch.Size([184, 80, 1, 1]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer10.expand_conv.bn.weight - torch.Size([184]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer10.expand_conv.bn.bias - torch.Size([184]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer10.depthwise_conv.conv.weight - torch.Size([184, 1, 3, 3]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer10.depthwise_conv.bn.weight - torch.Size([184]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer10.depthwise_conv.bn.bias - torch.Size([184]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer10.linear_conv.conv.weight - torch.Size([80, 184, 1, 1]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer10.linear_conv.bn.weight - torch.Size([80]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer10.linear_conv.bn.bias - torch.Size([80]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer11.expand_conv.conv.weight - torch.Size([480, 80, 1, 1]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer11.expand_conv.bn.weight - torch.Size([480]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer11.expand_conv.bn.bias - torch.Size([480]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer11.depthwise_conv.conv.weight - torch.Size([480, 1, 3, 3]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer11.depthwise_conv.bn.weight - torch.Size([480]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer11.depthwise_conv.bn.bias - torch.Size([480]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer11.se.conv1.conv.weight - torch.Size([120, 480, 1, 1]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer11.se.conv1.conv.bias - torch.Size([120]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer11.se.conv2.conv.weight - torch.Size([480, 120, 1, 1]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer11.se.conv2.conv.bias - torch.Size([480]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer11.linear_conv.conv.weight - torch.Size([112, 480, 1, 1]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer11.linear_conv.bn.weight - torch.Size([112]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer11.linear_conv.bn.bias - torch.Size([112]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer12.expand_conv.conv.weight - torch.Size([672, 112, 1, 1]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer12.expand_conv.bn.weight - torch.Size([672]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer12.expand_conv.bn.bias - torch.Size([672]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer12.depthwise_conv.conv.weight - torch.Size([672, 1, 3, 3]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer12.depthwise_conv.bn.weight - torch.Size([672]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer12.depthwise_conv.bn.bias - torch.Size([672]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer12.se.conv1.conv.weight - torch.Size([168, 672, 1, 1]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer12.se.conv1.conv.bias - torch.Size([168]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer12.se.conv2.conv.weight - torch.Size([672, 168, 1, 1]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer12.se.conv2.conv.bias - torch.Size([672]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer12.linear_conv.conv.weight - torch.Size([112, 672, 1, 1]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer12.linear_conv.bn.weight - torch.Size([112]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer12.linear_conv.bn.bias - torch.Size([112]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer13.expand_conv.conv.weight - torch.Size([672, 112, 1, 1]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer13.expand_conv.bn.weight - torch.Size([672]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer13.expand_conv.bn.bias - torch.Size([672]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer13.depthwise_conv.conv.weight - torch.Size([672, 1, 5, 5]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer13.depthwise_conv.bn.weight - torch.Size([672]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer13.depthwise_conv.bn.bias - torch.Size([672]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer13.se.conv1.conv.weight - torch.Size([168, 672, 1, 1]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer13.se.conv1.conv.bias - torch.Size([168]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer13.se.conv2.conv.weight - torch.Size([672, 168, 1, 1]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer13.se.conv2.conv.bias - torch.Size([672]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer13.linear_conv.conv.weight - torch.Size([160, 672, 1, 1]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer13.linear_conv.bn.weight - torch.Size([160]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer13.linear_conv.bn.bias - torch.Size([160]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer14.expand_conv.conv.weight - torch.Size([960, 160, 1, 1]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer14.expand_conv.bn.weight - torch.Size([960]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer14.expand_conv.bn.bias - torch.Size([960]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer14.depthwise_conv.conv.weight - torch.Size([960, 1, 5, 5]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer14.depthwise_conv.bn.weight - torch.Size([960]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer14.depthwise_conv.bn.bias - torch.Size([960]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer14.se.conv1.conv.weight - torch.Size([240, 960, 1, 1]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer14.se.conv1.conv.bias - torch.Size([240]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer14.se.conv2.conv.weight - torch.Size([960, 240, 1, 1]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer14.se.conv2.conv.bias - torch.Size([960]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer14.linear_conv.conv.weight - torch.Size([160, 960, 1, 1]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer14.linear_conv.bn.weight - torch.Size([160]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer14.linear_conv.bn.bias - torch.Size([160]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer15.expand_conv.conv.weight - torch.Size([960, 160, 1, 1]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer15.expand_conv.bn.weight - torch.Size([960]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer15.expand_conv.bn.bias - torch.Size([960]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer15.depthwise_conv.conv.weight - torch.Size([960, 1, 5, 5]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer15.depthwise_conv.bn.weight - torch.Size([960]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer15.depthwise_conv.bn.bias - torch.Size([960]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer15.se.conv1.conv.weight - torch.Size([240, 960, 1, 1]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer15.se.conv1.conv.bias - torch.Size([240]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer15.se.conv2.conv.weight - torch.Size([960, 240, 1, 1]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer15.se.conv2.conv.bias - torch.Size([960]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer15.linear_conv.conv.weight - torch.Size([160, 960, 1, 1]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer15.linear_conv.bn.weight - torch.Size([160]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer15.linear_conv.bn.bias - torch.Size([160]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer16.conv.weight - torch.Size([960, 160, 1, 1]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer16.bn.weight - torch.Size([960]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer16.bn.bias - torch.Size([960]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+head.fc.weight - torch.Size([12, 960]): 
+NormalInit: mean=0, std=0.01, bias=0 
+
+head.fc.bias - torch.Size([12]): 
+NormalInit: mean=0, std=0.01, bias=0 

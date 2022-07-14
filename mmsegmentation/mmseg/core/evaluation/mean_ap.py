@@ -69,5 +69,4 @@ def mAP(pred, target):
     ap = np.zeros(num_classes)
     for k in range(num_classes):
         ap[k] = average_precision(pred[:, k], target[:, k])
-    mean_ap = ap.mean() * 100.0
-    return mean_ap
+    return ap

@@ -1,0 +1,1167 @@
+2022-07-08 12:00:42,135 - mmcls - INFO - Environment info:
+------------------------------------------------------------
+sys.platform: linux
+Python: 3.8.13 (default, Mar 28 2022, 11:38:47) [GCC 7.5.0]
+CUDA available: True
+GPU 0,1,2,3: NVIDIA TITAN X (Pascal)
+CUDA_HOME: /usr/local/cuda
+NVCC: Cuda compilation tools, release 11.7, V11.7.64
+GCC: gcc (Ubuntu 9.4.0-1ubuntu1~20.04.1) 9.4.0
+PyTorch: 1.10.0
+PyTorch compiling details: PyTorch built with:
+  - GCC 7.3
+  - C++ Version: 201402
+  - Intel(R) oneAPI Math Kernel Library Version 2021.4-Product Build 20210904 for Intel(R) 64 architecture applications
+  - Intel(R) MKL-DNN v2.2.3 (Git Hash 7336ca9f055cf1bfa13efb658fe15dc9b41f0740)
+  - OpenMP 201511 (a.k.a. OpenMP 4.5)
+  - LAPACK is enabled (usually provided by MKL)
+  - NNPACK is enabled
+  - CPU capability usage: AVX2
+  - CUDA Runtime 11.3
+  - NVCC architecture flags: -gencode;arch=compute_37,code=sm_37;-gencode;arch=compute_50,code=sm_50;-gencode;arch=compute_60,code=sm_60;-gencode;arch=compute_61,code=sm_61;-gencode;arch=compute_70,code=sm_70;-gencode;arch=compute_75,code=sm_75;-gencode;arch=compute_80,code=sm_80;-gencode;arch=compute_86,code=sm_86;-gencode;arch=compute_37,code=compute_37
+  - CuDNN 8.2
+  - Magma 2.5.2
+  - Build settings: BLAS_INFO=mkl, BUILD_TYPE=Release, CUDA_VERSION=11.3, CUDNN_VERSION=8.2.0, CXX_COMPILER=/opt/rh/devtoolset-7/root/usr/bin/c++, CXX_FLAGS= -Wno-deprecated -fvisibility-inlines-hidden -DUSE_PTHREADPOOL -fopenmp -DNDEBUG -DUSE_KINETO -DUSE_FBGEMM -DUSE_QNNPACK -DUSE_PYTORCH_QNNPACK -DUSE_XNNPACK -DSYMBOLICATE_MOBILE_DEBUG_HANDLE -DEDGE_PROFILER_USE_KINETO -O2 -fPIC -Wno-narrowing -Wall -Wextra -Werror=return-type -Wno-missing-field-initializers -Wno-type-limits -Wno-array-bounds -Wno-unknown-pragmas -Wno-sign-compare -Wno-unused-parameter -Wno-unused-variable -Wno-unused-function -Wno-unused-result -Wno-unused-local-typedefs -Wno-strict-overflow -Wno-strict-aliasing -Wno-error=deprecated-declarations -Wno-stringop-overflow -Wno-psabi -Wno-error=pedantic -Wno-error=redundant-decls -Wno-error=old-style-cast -fdiagnostics-color=always -faligned-new -Wno-unused-but-set-variable -Wno-maybe-uninitialized -fno-math-errno -fno-trapping-math -Werror=format -Wno-stringop-overflow, LAPACK_INFO=mkl, PERF_WITH_AVX=1, PERF_WITH_AVX2=1, PERF_WITH_AVX512=1, TORCH_VERSION=1.10.0, USE_CUDA=ON, USE_CUDNN=ON, USE_EXCEPTION_PTR=1, USE_GFLAGS=OFF, USE_GLOG=OFF, USE_MKL=ON, USE_MKLDNN=ON, USE_MPI=OFF, USE_NCCL=ON, USE_NNPACK=ON, USE_OPENMP=ON, 
+
+TorchVision: 0.11.0
+OpenCV: 4.6.0
+MMCV: 1.5.3
+MMCV Compiler: GCC 7.3
+MMCV CUDA Compiler: 11.3
+MMClassification: 0.23.1+85d1e94
+------------------------------------------------------------
+
+2022-07-08 12:00:42,136 - mmcls - INFO - Distributed training: True
+2022-07-08 12:00:42,487 - mmcls - INFO - Config:
+dataset_type = 'TextureDataset'
+img_norm_cfg = dict(
+    mean=[123.675, 116.28, 103.53], std=[58.395, 57.12, 57.375], to_rgb=True)
+train_pipeline = [
+    dict(type='LoadImageFromFile'),
+    dict(type='RandomResizedCrop', size=224),
+    dict(type='RandomFlip', flip_prob=0.5, direction='horizontal'),
+    dict(
+        type='Normalize',
+        mean=[123.675, 116.28, 103.53],
+        std=[58.395, 57.12, 57.375],
+        to_rgb=True),
+    dict(type='ImageToTensor', keys=['img']),
+    dict(type='ToTensor', keys=['gt_label']),
+    dict(type='Collect', keys=['img', 'gt_label'])
+]
+test_pipeline = [
+    dict(type='LoadImageFromFile'),
+    dict(type='Resize', size=(256, -1)),
+    dict(type='CenterCrop', crop_size=224),
+    dict(
+        type='Normalize',
+        mean=[123.675, 116.28, 103.53],
+        std=[58.395, 57.12, 57.375],
+        to_rgb=True),
+    dict(type='ImageToTensor', keys=['img']),
+    dict(type='Collect', keys=['img'])
+]
+data = dict(
+    samples_per_gpu=16,
+    workers_per_gpu=4,
+    train=dict(
+        type='TextureDataset',
+        data_prefix='TextureDataset/',
+        ann_file='TextureDataset/train.txt',
+        pipeline=[
+            dict(type='LoadImageFromFile'),
+            dict(type='RandomResizedCrop', size=224),
+            dict(type='RandomFlip', flip_prob=0.5, direction='horizontal'),
+            dict(
+                type='Normalize',
+                mean=[123.675, 116.28, 103.53],
+                std=[58.395, 57.12, 57.375],
+                to_rgb=True),
+            dict(type='ImageToTensor', keys=['img']),
+            dict(type='ToTensor', keys=['gt_label']),
+            dict(type='Collect', keys=['img', 'gt_label'])
+        ]),
+    val=dict(
+        type='TextureDataset',
+        data_prefix='TextureDataset/',
+        ann_file='TextureDataset/test.txt',
+        pipeline=[
+            dict(type='LoadImageFromFile'),
+            dict(type='Resize', size=(256, -1)),
+            dict(type='CenterCrop', crop_size=224),
+            dict(
+                type='Normalize',
+                mean=[123.675, 116.28, 103.53],
+                std=[58.395, 57.12, 57.375],
+                to_rgb=True),
+            dict(type='ImageToTensor', keys=['img']),
+            dict(type='Collect', keys=['img'])
+        ]),
+    test=dict(
+        type='TextureDataset',
+        data_prefix='TextureDataset/',
+        ann_file='TextureDataset/test.txt',
+        pipeline=[
+            dict(type='LoadImageFromFile'),
+            dict(type='Resize', size=(256, -1)),
+            dict(type='CenterCrop', crop_size=224),
+            dict(
+                type='Normalize',
+                mean=[123.675, 116.28, 103.53],
+                std=[58.395, 57.12, 57.375],
+                to_rgb=True),
+            dict(type='ImageToTensor', keys=['img']),
+            dict(type='Collect', keys=['img'])
+        ]))
+evaluation = dict(interval=1, metric=['mAP', 'ACC'])
+checkpoint_config = dict(interval=10)
+log_config = dict(interval=10, hooks=[dict(type='TextLoggerHook')])
+dist_params = dict(backend='nccl')
+log_level = 'INFO'
+load_from = None
+resume_from = None
+workflow = [('train', 1)]
+model = dict(
+    type='ImageClassifier',
+    backbone=dict(
+        type='MobileNetV3',
+        arch='large',
+        init_cfg=dict(
+            type='Pretrained',
+            checkpoint=
+            'https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth',
+            prefix='backbone')),
+    neck=dict(type='GlobalAveragePooling'),
+    head=dict(
+        type='MultiLabelLinearClsHead',
+        num_classes=8,
+        in_channels=960,
+        loss=dict(type='CrossEntropyLoss', loss_weight=1.0, use_sigmoid=True)))
+optimizer = dict(
+    type='SGD',
+    lr=0.001,
+    momentum=0.9,
+    weight_decay=0,
+    paramwise_cfg=dict(
+        custom_keys=dict({'.backbone.classifier': dict(lr_mult=10)})))
+optimizer_config = dict(grad_clip=None)
+lr_config = dict(policy='step', step=20, gamma=0.1)
+runner = dict(type='EpochBasedRunner', max_epochs=40)
+work_dir = './work_dirs/mobile_v3_large_4xb16_texture'
+gpu_ids = range(0, 4)
+
+2022-07-08 12:00:46,086 - mmcls - INFO - Set random seed to 2092266948, deterministic: False
+2022-07-08 12:00:46,172 - mmcls - INFO - initialize MobileNetV3 with init_cfg {'type': 'Pretrained', 'checkpoint': 'https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth', 'prefix': 'backbone'}
+2022-07-08 12:00:46,236 - mmcls - INFO - initialize MultiLabelLinearClsHead with init_cfg {'type': 'Normal', 'layer': 'Linear', 'std': 0.01}
+Name of parameter - Initialization information
+
+backbone.layer0.conv.weight - torch.Size([16, 3, 3, 3]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer0.bn.weight - torch.Size([16]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer0.bn.bias - torch.Size([16]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer1.depthwise_conv.conv.weight - torch.Size([16, 1, 3, 3]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer1.depthwise_conv.bn.weight - torch.Size([16]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer1.depthwise_conv.bn.bias - torch.Size([16]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer1.linear_conv.conv.weight - torch.Size([16, 16, 1, 1]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer1.linear_conv.bn.weight - torch.Size([16]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer1.linear_conv.bn.bias - torch.Size([16]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer2.expand_conv.conv.weight - torch.Size([64, 16, 1, 1]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer2.expand_conv.bn.weight - torch.Size([64]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer2.expand_conv.bn.bias - torch.Size([64]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer2.depthwise_conv.conv.weight - torch.Size([64, 1, 3, 3]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer2.depthwise_conv.bn.weight - torch.Size([64]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer2.depthwise_conv.bn.bias - torch.Size([64]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer2.linear_conv.conv.weight - torch.Size([24, 64, 1, 1]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer2.linear_conv.bn.weight - torch.Size([24]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer2.linear_conv.bn.bias - torch.Size([24]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer3.expand_conv.conv.weight - torch.Size([72, 24, 1, 1]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer3.expand_conv.bn.weight - torch.Size([72]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer3.expand_conv.bn.bias - torch.Size([72]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer3.depthwise_conv.conv.weight - torch.Size([72, 1, 3, 3]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer3.depthwise_conv.bn.weight - torch.Size([72]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer3.depthwise_conv.bn.bias - torch.Size([72]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer3.linear_conv.conv.weight - torch.Size([24, 72, 1, 1]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer3.linear_conv.bn.weight - torch.Size([24]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer3.linear_conv.bn.bias - torch.Size([24]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer4.expand_conv.conv.weight - torch.Size([72, 24, 1, 1]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer4.expand_conv.bn.weight - torch.Size([72]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer4.expand_conv.bn.bias - torch.Size([72]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer4.depthwise_conv.conv.weight - torch.Size([72, 1, 5, 5]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer4.depthwise_conv.bn.weight - torch.Size([72]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer4.depthwise_conv.bn.bias - torch.Size([72]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer4.se.conv1.conv.weight - torch.Size([24, 72, 1, 1]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer4.se.conv1.conv.bias - torch.Size([24]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer4.se.conv2.conv.weight - torch.Size([72, 24, 1, 1]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer4.se.conv2.conv.bias - torch.Size([72]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer4.linear_conv.conv.weight - torch.Size([40, 72, 1, 1]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer4.linear_conv.bn.weight - torch.Size([40]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer4.linear_conv.bn.bias - torch.Size([40]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer5.expand_conv.conv.weight - torch.Size([120, 40, 1, 1]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer5.expand_conv.bn.weight - torch.Size([120]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer5.expand_conv.bn.bias - torch.Size([120]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer5.depthwise_conv.conv.weight - torch.Size([120, 1, 5, 5]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer5.depthwise_conv.bn.weight - torch.Size([120]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer5.depthwise_conv.bn.bias - torch.Size([120]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer5.se.conv1.conv.weight - torch.Size([32, 120, 1, 1]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer5.se.conv1.conv.bias - torch.Size([32]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer5.se.conv2.conv.weight - torch.Size([120, 32, 1, 1]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer5.se.conv2.conv.bias - torch.Size([120]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer5.linear_conv.conv.weight - torch.Size([40, 120, 1, 1]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer5.linear_conv.bn.weight - torch.Size([40]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer5.linear_conv.bn.bias - torch.Size([40]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer6.expand_conv.conv.weight - torch.Size([120, 40, 1, 1]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer6.expand_conv.bn.weight - torch.Size([120]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer6.expand_conv.bn.bias - torch.Size([120]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer6.depthwise_conv.conv.weight - torch.Size([120, 1, 5, 5]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer6.depthwise_conv.bn.weight - torch.Size([120]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer6.depthwise_conv.bn.bias - torch.Size([120]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer6.se.conv1.conv.weight - torch.Size([32, 120, 1, 1]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer6.se.conv1.conv.bias - torch.Size([32]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer6.se.conv2.conv.weight - torch.Size([120, 32, 1, 1]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer6.se.conv2.conv.bias - torch.Size([120]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer6.linear_conv.conv.weight - torch.Size([40, 120, 1, 1]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer6.linear_conv.bn.weight - torch.Size([40]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer6.linear_conv.bn.bias - torch.Size([40]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer7.expand_conv.conv.weight - torch.Size([240, 40, 1, 1]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer7.expand_conv.bn.weight - torch.Size([240]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer7.expand_conv.bn.bias - torch.Size([240]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer7.depthwise_conv.conv.weight - torch.Size([240, 1, 3, 3]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer7.depthwise_conv.bn.weight - torch.Size([240]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer7.depthwise_conv.bn.bias - torch.Size([240]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer7.linear_conv.conv.weight - torch.Size([80, 240, 1, 1]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer7.linear_conv.bn.weight - torch.Size([80]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer7.linear_conv.bn.bias - torch.Size([80]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer8.expand_conv.conv.weight - torch.Size([200, 80, 1, 1]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer8.expand_conv.bn.weight - torch.Size([200]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer8.expand_conv.bn.bias - torch.Size([200]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer8.depthwise_conv.conv.weight - torch.Size([200, 1, 3, 3]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer8.depthwise_conv.bn.weight - torch.Size([200]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer8.depthwise_conv.bn.bias - torch.Size([200]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer8.linear_conv.conv.weight - torch.Size([80, 200, 1, 1]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer8.linear_conv.bn.weight - torch.Size([80]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer8.linear_conv.bn.bias - torch.Size([80]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer9.expand_conv.conv.weight - torch.Size([184, 80, 1, 1]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer9.expand_conv.bn.weight - torch.Size([184]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer9.expand_conv.bn.bias - torch.Size([184]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer9.depthwise_conv.conv.weight - torch.Size([184, 1, 3, 3]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer9.depthwise_conv.bn.weight - torch.Size([184]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer9.depthwise_conv.bn.bias - torch.Size([184]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer9.linear_conv.conv.weight - torch.Size([80, 184, 1, 1]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer9.linear_conv.bn.weight - torch.Size([80]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer9.linear_conv.bn.bias - torch.Size([80]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer10.expand_conv.conv.weight - torch.Size([184, 80, 1, 1]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer10.expand_conv.bn.weight - torch.Size([184]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer10.expand_conv.bn.bias - torch.Size([184]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer10.depthwise_conv.conv.weight - torch.Size([184, 1, 3, 3]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer10.depthwise_conv.bn.weight - torch.Size([184]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer10.depthwise_conv.bn.bias - torch.Size([184]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer10.linear_conv.conv.weight - torch.Size([80, 184, 1, 1]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer10.linear_conv.bn.weight - torch.Size([80]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer10.linear_conv.bn.bias - torch.Size([80]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer11.expand_conv.conv.weight - torch.Size([480, 80, 1, 1]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer11.expand_conv.bn.weight - torch.Size([480]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer11.expand_conv.bn.bias - torch.Size([480]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer11.depthwise_conv.conv.weight - torch.Size([480, 1, 3, 3]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer11.depthwise_conv.bn.weight - torch.Size([480]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer11.depthwise_conv.bn.bias - torch.Size([480]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer11.se.conv1.conv.weight - torch.Size([120, 480, 1, 1]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer11.se.conv1.conv.bias - torch.Size([120]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer11.se.conv2.conv.weight - torch.Size([480, 120, 1, 1]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer11.se.conv2.conv.bias - torch.Size([480]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer11.linear_conv.conv.weight - torch.Size([112, 480, 1, 1]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer11.linear_conv.bn.weight - torch.Size([112]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer11.linear_conv.bn.bias - torch.Size([112]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer12.expand_conv.conv.weight - torch.Size([672, 112, 1, 1]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer12.expand_conv.bn.weight - torch.Size([672]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer12.expand_conv.bn.bias - torch.Size([672]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer12.depthwise_conv.conv.weight - torch.Size([672, 1, 3, 3]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer12.depthwise_conv.bn.weight - torch.Size([672]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer12.depthwise_conv.bn.bias - torch.Size([672]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer12.se.conv1.conv.weight - torch.Size([168, 672, 1, 1]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer12.se.conv1.conv.bias - torch.Size([168]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer12.se.conv2.conv.weight - torch.Size([672, 168, 1, 1]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer12.se.conv2.conv.bias - torch.Size([672]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer12.linear_conv.conv.weight - torch.Size([112, 672, 1, 1]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer12.linear_conv.bn.weight - torch.Size([112]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer12.linear_conv.bn.bias - torch.Size([112]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer13.expand_conv.conv.weight - torch.Size([672, 112, 1, 1]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer13.expand_conv.bn.weight - torch.Size([672]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer13.expand_conv.bn.bias - torch.Size([672]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer13.depthwise_conv.conv.weight - torch.Size([672, 1, 5, 5]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer13.depthwise_conv.bn.weight - torch.Size([672]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer13.depthwise_conv.bn.bias - torch.Size([672]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer13.se.conv1.conv.weight - torch.Size([168, 672, 1, 1]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer13.se.conv1.conv.bias - torch.Size([168]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer13.se.conv2.conv.weight - torch.Size([672, 168, 1, 1]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer13.se.conv2.conv.bias - torch.Size([672]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer13.linear_conv.conv.weight - torch.Size([160, 672, 1, 1]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer13.linear_conv.bn.weight - torch.Size([160]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer13.linear_conv.bn.bias - torch.Size([160]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer14.expand_conv.conv.weight - torch.Size([960, 160, 1, 1]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer14.expand_conv.bn.weight - torch.Size([960]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer14.expand_conv.bn.bias - torch.Size([960]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer14.depthwise_conv.conv.weight - torch.Size([960, 1, 5, 5]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer14.depthwise_conv.bn.weight - torch.Size([960]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer14.depthwise_conv.bn.bias - torch.Size([960]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer14.se.conv1.conv.weight - torch.Size([240, 960, 1, 1]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer14.se.conv1.conv.bias - torch.Size([240]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer14.se.conv2.conv.weight - torch.Size([960, 240, 1, 1]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer14.se.conv2.conv.bias - torch.Size([960]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer14.linear_conv.conv.weight - torch.Size([160, 960, 1, 1]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer14.linear_conv.bn.weight - torch.Size([160]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer14.linear_conv.bn.bias - torch.Size([160]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer15.expand_conv.conv.weight - torch.Size([960, 160, 1, 1]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer15.expand_conv.bn.weight - torch.Size([960]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer15.expand_conv.bn.bias - torch.Size([960]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer15.depthwise_conv.conv.weight - torch.Size([960, 1, 5, 5]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer15.depthwise_conv.bn.weight - torch.Size([960]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer15.depthwise_conv.bn.bias - torch.Size([960]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer15.se.conv1.conv.weight - torch.Size([240, 960, 1, 1]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer15.se.conv1.conv.bias - torch.Size([240]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer15.se.conv2.conv.weight - torch.Size([960, 240, 1, 1]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer15.se.conv2.conv.bias - torch.Size([960]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer15.linear_conv.conv.weight - torch.Size([160, 960, 1, 1]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer15.linear_conv.bn.weight - torch.Size([160]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer15.linear_conv.bn.bias - torch.Size([160]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer16.conv.weight - torch.Size([960, 160, 1, 1]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer16.bn.weight - torch.Size([960]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+backbone.layer16.bn.bias - torch.Size([960]): 
+PretrainedInit: load from https://download.openmmlab.com/mmclassification/v0/mobilenet_v3/convert/mobilenet_v3_large-3ea3c186.pth 
+
+head.fc.weight - torch.Size([8, 960]): 
+NormalInit: mean=0, std=0.01, bias=0 
+
+head.fc.bias - torch.Size([8]): 
+NormalInit: mean=0, std=0.01, bias=0 
+2022-07-08 12:02:21,942 - mmcls - INFO - Start running, host: hli5@tynamo, work_dir: /nfs/nfs9/home/nobackup/hli5/FoodCV/work_dirs/mobile_v3_large_4xb16_texture
+2022-07-08 12:02:21,943 - mmcls - INFO - Hooks will be executed in the following order:
+before_run:
+(VERY_HIGH   ) StepLrUpdaterHook                  
+(NORMAL      ) CheckpointHook                     
+(LOW         ) DistEvalHook                       
+(VERY_LOW    ) TextLoggerHook                     
+ -------------------- 
+before_train_epoch:
+(VERY_HIGH   ) StepLrUpdaterHook                  
+(NORMAL      ) DistSamplerSeedHook                
+(LOW         ) IterTimerHook                      
+(LOW         ) DistEvalHook                       
+(VERY_LOW    ) TextLoggerHook                     
+ -------------------- 
+before_train_iter:
+(VERY_HIGH   ) StepLrUpdaterHook                  
+(LOW         ) IterTimerHook                      
+(LOW         ) DistEvalHook                       
+ -------------------- 
+after_train_iter:
+(ABOVE_NORMAL) DistOptimizerHook                  
+(NORMAL      ) CheckpointHook                     
+(LOW         ) IterTimerHook                      
+(LOW         ) DistEvalHook                       
+(VERY_LOW    ) TextLoggerHook                     
+ -------------------- 
+after_train_epoch:
+(NORMAL      ) CheckpointHook                     
+(LOW         ) DistEvalHook                       
+(VERY_LOW    ) TextLoggerHook                     
+ -------------------- 
+before_val_epoch:
+(NORMAL      ) DistSamplerSeedHook                
+(LOW         ) IterTimerHook                      
+(VERY_LOW    ) TextLoggerHook                     
+ -------------------- 
+before_val_iter:
+(LOW         ) IterTimerHook                      
+ -------------------- 
+after_val_iter:
+(LOW         ) IterTimerHook                      
+ -------------------- 
+after_val_epoch:
+(VERY_LOW    ) TextLoggerHook                     
+ -------------------- 
+after_run:
+(VERY_LOW    ) TextLoggerHook                     
+ -------------------- 
+2022-07-08 12:02:21,943 - mmcls - INFO - workflow: [('train', 1)], max: 40 epochs
+2022-07-08 12:02:21,944 - mmcls - INFO - Checkpoints will be saved to /nfs/nfs9/home/nobackup/hli5/FoodCV/work_dirs/mobile_v3_large_4xb16_texture by HardDiskBackend.
+2022-07-08 12:02:27,818 - mmcls - INFO - Epoch [1][10/100]	lr: 1.000e-03, eta: 0:38:57, time: 0.586, data_time: 0.259, memory: 737, loss: 4.9545
+2022-07-08 12:02:28,545 - mmcls - INFO - Epoch [1][20/100]	lr: 1.000e-03, eta: 0:21:50, time: 0.073, data_time: 0.002, memory: 737, loss: 4.2791
+2022-07-08 12:02:29,541 - mmcls - INFO - Epoch [1][30/100]	lr: 1.000e-03, eta: 0:16:42, time: 0.099, data_time: 0.039, memory: 737, loss: 4.0062
+2022-07-08 12:02:30,456 - mmcls - INFO - Epoch [1][40/100]	lr: 1.000e-03, eta: 0:14:00, time: 0.092, data_time: 0.010, memory: 737, loss: 3.8691
+2022-07-08 12:02:31,265 - mmcls - INFO - Epoch [1][50/100]	lr: 1.000e-03, eta: 0:12:14, time: 0.081, data_time: 0.015, memory: 737, loss: 3.8643
+2022-07-08 12:02:32,410 - mmcls - INFO - Epoch [1][60/100]	lr: 1.000e-03, eta: 0:11:26, time: 0.115, data_time: 0.047, memory: 737, loss: 3.8376
+2022-07-08 12:02:33,391 - mmcls - INFO - Epoch [1][70/100]	lr: 1.000e-03, eta: 0:10:41, time: 0.097, data_time: 0.004, memory: 737, loss: 3.7572
+2022-07-08 12:02:34,272 - mmcls - INFO - Epoch [1][80/100]	lr: 1.000e-03, eta: 0:10:03, time: 0.088, data_time: 0.010, memory: 737, loss: 3.7063
+2022-07-08 12:02:35,405 - mmcls - INFO - Epoch [1][90/100]	lr: 1.000e-03, eta: 0:09:44, time: 0.114, data_time: 0.054, memory: 737, loss: 3.7176
+2022-07-08 12:02:36,421 - mmcls - INFO - Epoch [1][100/100]	lr: 1.000e-03, eta: 0:09:24, time: 0.102, data_time: 0.049, memory: 737, loss: 3.5880
+2022-07-08 12:02:40,823 - mmcls - INFO - Epoch(val) [1][37]	mAP: 60.9406, ACC: 0.8048
+2022-07-08 12:02:44,246 - mmcls - INFO - Epoch [2][10/100]	lr: 1.000e-03, eta: 0:10:32, time: 0.342, data_time: 0.225, memory: 737, loss: 3.4709
+2022-07-08 12:02:45,183 - mmcls - INFO - Epoch [2][20/100]	lr: 1.000e-03, eta: 0:10:08, time: 0.094, data_time: 0.001, memory: 737, loss: 3.5056
+2022-07-08 12:02:45,785 - mmcls - INFO - Epoch [2][30/100]	lr: 1.000e-03, eta: 0:09:38, time: 0.060, data_time: 0.001, memory: 737, loss: 3.5132
+2022-07-08 12:02:46,807 - mmcls - INFO - Epoch [2][40/100]	lr: 1.000e-03, eta: 0:09:23, time: 0.101, data_time: 0.044, memory: 737, loss: 3.4765
+2022-07-08 12:02:47,819 - mmcls - INFO - Epoch [2][50/100]	lr: 1.000e-03, eta: 0:09:10, time: 0.102, data_time: 0.039, memory: 737, loss: 3.4412
+2022-07-08 12:02:48,655 - mmcls - INFO - Epoch [2][60/100]	lr: 1.000e-03, eta: 0:08:54, time: 0.084, data_time: 0.020, memory: 737, loss: 3.4283
+2022-07-08 12:02:49,394 - mmcls - INFO - Epoch [2][70/100]	lr: 1.000e-03, eta: 0:08:38, time: 0.073, data_time: 0.017, memory: 737, loss: 3.3486
+2022-07-08 12:02:50,261 - mmcls - INFO - Epoch [2][80/100]	lr: 1.000e-03, eta: 0:08:27, time: 0.087, data_time: 0.002, memory: 737, loss: 3.4533
+2022-07-08 12:02:51,096 - mmcls - INFO - Epoch [2][90/100]	lr: 1.000e-03, eta: 0:08:15, time: 0.083, data_time: 0.001, memory: 737, loss: 3.4674
+2022-07-08 12:02:52,228 - mmcls - INFO - Epoch [2][100/100]	lr: 1.000e-03, eta: 0:08:11, time: 0.113, data_time: 0.001, memory: 737, loss: 3.4114
+2022-07-08 12:02:55,680 - mmcls - INFO - Epoch(val) [2][37]	mAP: 65.0688, ACC: 0.8261
+2022-07-08 12:02:59,044 - mmcls - INFO - Epoch [3][10/100]	lr: 1.000e-03, eta: 0:08:47, time: 0.335, data_time: 0.273, memory: 737, loss: 3.3527
+2022-07-08 12:02:59,880 - mmcls - INFO - Epoch [3][20/100]	lr: 1.000e-03, eta: 0:08:36, time: 0.083, data_time: 0.008, memory: 737, loss: 3.3220
+2022-07-08 12:03:00,595 - mmcls - INFO - Epoch [3][30/100]	lr: 1.000e-03, eta: 0:08:24, time: 0.072, data_time: 0.002, memory: 737, loss: 3.3433
+2022-07-08 12:03:01,665 - mmcls - INFO - Epoch [3][40/100]	lr: 1.000e-03, eta: 0:08:18, time: 0.108, data_time: 0.019, memory: 737, loss: 3.2743
+2022-07-08 12:03:02,401 - mmcls - INFO - Epoch [3][50/100]	lr: 1.000e-03, eta: 0:08:08, time: 0.073, data_time: 0.001, memory: 737, loss: 3.2643
+2022-07-08 12:03:03,468 - mmcls - INFO - Epoch [3][60/100]	lr: 1.000e-03, eta: 0:08:03, time: 0.107, data_time: 0.002, memory: 737, loss: 3.2875
+2022-07-08 12:03:04,271 - mmcls - INFO - Epoch [3][70/100]	lr: 1.000e-03, eta: 0:07:55, time: 0.081, data_time: 0.002, memory: 737, loss: 3.3245
+2022-07-08 12:03:05,329 - mmcls - INFO - Epoch [3][80/100]	lr: 1.000e-03, eta: 0:07:51, time: 0.106, data_time: 0.001, memory: 737, loss: 3.2870
+2022-07-08 12:03:06,103 - mmcls - INFO - Epoch [3][90/100]	lr: 1.000e-03, eta: 0:07:43, time: 0.077, data_time: 0.001, memory: 737, loss: 3.1711
+2022-07-08 12:03:06,757 - mmcls - INFO - Epoch [3][100/100]	lr: 1.000e-03, eta: 0:07:35, time: 0.066, data_time: 0.001, memory: 737, loss: 3.2329
+2022-07-08 12:03:10,191 - mmcls - INFO - Epoch(val) [3][37]	mAP: 67.5914, ACC: 0.8365
+2022-07-08 12:03:13,342 - mmcls - INFO - Epoch [4][10/100]	lr: 1.000e-03, eta: 0:07:56, time: 0.314, data_time: 0.245, memory: 737, loss: 3.1539
+2022-07-08 12:03:14,214 - mmcls - INFO - Epoch [4][20/100]	lr: 1.000e-03, eta: 0:07:50, time: 0.087, data_time: 0.001, memory: 737, loss: 3.2193
+2022-07-08 12:03:14,862 - mmcls - INFO - Epoch [4][30/100]	lr: 1.000e-03, eta: 0:07:42, time: 0.066, data_time: 0.001, memory: 737, loss: 3.1729
+2022-07-08 12:03:15,654 - mmcls - INFO - Epoch [4][40/100]	lr: 1.000e-03, eta: 0:07:36, time: 0.078, data_time: 0.015, memory: 737, loss: 3.2540
+2022-07-08 12:03:16,381 - mmcls - INFO - Epoch [4][50/100]	lr: 1.000e-03, eta: 0:07:29, time: 0.073, data_time: 0.001, memory: 737, loss: 3.1046
+2022-07-08 12:03:17,463 - mmcls - INFO - Epoch [4][60/100]	lr: 1.000e-03, eta: 0:07:26, time: 0.109, data_time: 0.016, memory: 737, loss: 3.1550
+2022-07-08 12:03:18,278 - mmcls - INFO - Epoch [4][70/100]	lr: 1.000e-03, eta: 0:07:21, time: 0.082, data_time: 0.001, memory: 737, loss: 3.1016
+2022-07-08 12:03:19,501 - mmcls - INFO - Epoch [4][80/100]	lr: 1.000e-03, eta: 0:07:20, time: 0.122, data_time: 0.001, memory: 737, loss: 3.1962
+2022-07-08 12:03:20,122 - mmcls - INFO - Epoch [4][90/100]	lr: 1.000e-03, eta: 0:07:13, time: 0.062, data_time: 0.001, memory: 737, loss: 3.3116
+2022-07-08 12:03:21,054 - mmcls - INFO - Epoch [4][100/100]	lr: 1.000e-03, eta: 0:07:09, time: 0.094, data_time: 0.001, memory: 737, loss: 3.0471
+2022-07-08 12:03:24,519 - mmcls - INFO - Epoch(val) [4][37]	mAP: 69.4705, ACC: 0.8431
+2022-07-08 12:03:27,677 - mmcls - INFO - Epoch [5][10/100]	lr: 1.000e-03, eta: 0:07:25, time: 0.314, data_time: 0.241, memory: 737, loss: 3.1198
+2022-07-08 12:03:28,341 - mmcls - INFO - Epoch [5][20/100]	lr: 1.000e-03, eta: 0:07:19, time: 0.066, data_time: 0.009, memory: 737, loss: 3.0891
+2022-07-08 12:03:29,188 - mmcls - INFO - Epoch [5][30/100]	lr: 1.000e-03, eta: 0:07:15, time: 0.085, data_time: 0.004, memory: 737, loss: 3.0937
+2022-07-08 12:03:30,381 - mmcls - INFO - Epoch [5][40/100]	lr: 1.000e-03, eta: 0:07:13, time: 0.119, data_time: 0.001, memory: 737, loss: 3.0824
+2022-07-08 12:03:31,039 - mmcls - INFO - Epoch [5][50/100]	lr: 1.000e-03, eta: 0:07:08, time: 0.066, data_time: 0.002, memory: 737, loss: 3.1527
+2022-07-08 12:03:31,767 - mmcls - INFO - Epoch [5][60/100]	lr: 1.000e-03, eta: 0:07:03, time: 0.073, data_time: 0.001, memory: 737, loss: 3.0677
+2022-07-08 12:03:32,547 - mmcls - INFO - Epoch [5][70/100]	lr: 1.000e-03, eta: 0:06:59, time: 0.079, data_time: 0.006, memory: 737, loss: 3.1192
+2022-07-08 12:03:33,617 - mmcls - INFO - Epoch [5][80/100]	lr: 1.000e-03, eta: 0:06:56, time: 0.106, data_time: 0.002, memory: 737, loss: 3.1926
+2022-07-08 12:03:34,432 - mmcls - INFO - Epoch [5][90/100]	lr: 1.000e-03, eta: 0:06:53, time: 0.082, data_time: 0.025, memory: 737, loss: 3.0219
+2022-07-08 12:03:35,657 - mmcls - INFO - Epoch [5][100/100]	lr: 1.000e-03, eta: 0:06:52, time: 0.122, data_time: 0.000, memory: 737, loss: 3.0408
+2022-07-08 12:03:39,099 - mmcls - INFO - Epoch(val) [5][37]	mAP: 70.6487, ACC: 0.8448
+2022-07-08 12:03:42,310 - mmcls - INFO - Epoch [6][10/100]	lr: 1.000e-03, eta: 0:07:04, time: 0.320, data_time: 0.237, memory: 737, loss: 3.2018
+2022-07-08 12:03:43,007 - mmcls - INFO - Epoch [6][20/100]	lr: 1.000e-03, eta: 0:07:00, time: 0.069, data_time: 0.001, memory: 737, loss: 2.9836
+2022-07-08 12:03:43,803 - mmcls - INFO - Epoch [6][30/100]	lr: 1.000e-03, eta: 0:06:56, time: 0.080, data_time: 0.003, memory: 737, loss: 3.1425
+2022-07-08 12:03:44,597 - mmcls - INFO - Epoch [6][40/100]	lr: 1.000e-03, eta: 0:06:52, time: 0.080, data_time: 0.001, memory: 737, loss: 3.0072
+2022-07-08 12:03:45,504 - mmcls - INFO - Epoch [6][50/100]	lr: 1.000e-03, eta: 0:06:49, time: 0.090, data_time: 0.018, memory: 737, loss: 3.0208
+2022-07-08 12:03:46,408 - mmcls - INFO - Epoch [6][60/100]	lr: 1.000e-03, eta: 0:06:46, time: 0.090, data_time: 0.037, memory: 737, loss: 3.1397
+2022-07-08 12:03:47,318 - mmcls - INFO - Epoch [6][70/100]	lr: 1.000e-03, eta: 0:06:43, time: 0.091, data_time: 0.004, memory: 737, loss: 3.0063
+2022-07-08 12:03:48,068 - mmcls - INFO - Epoch [6][80/100]	lr: 1.000e-03, eta: 0:06:40, time: 0.075, data_time: 0.001, memory: 737, loss: 3.1054
+2022-07-08 12:03:48,752 - mmcls - INFO - Epoch [6][90/100]	lr: 1.000e-03, eta: 0:06:36, time: 0.070, data_time: 0.002, memory: 737, loss: 2.9520
+2022-07-08 12:03:49,740 - mmcls - INFO - Epoch [6][100/100]	lr: 1.000e-03, eta: 0:06:34, time: 0.098, data_time: 0.000, memory: 737, loss: 3.0675
+2022-07-08 12:03:53,266 - mmcls - INFO - Epoch(val) [6][37]	mAP: 71.7914, ACC: 0.8475
+2022-07-08 12:03:56,819 - mmcls - INFO - Epoch [7][10/100]	lr: 1.000e-03, eta: 0:06:46, time: 0.354, data_time: 0.225, memory: 737, loss: 2.9966
+2022-07-08 12:03:57,846 - mmcls - INFO - Epoch [7][20/100]	lr: 1.000e-03, eta: 0:06:43, time: 0.102, data_time: 0.037, memory: 737, loss: 2.9205
+2022-07-08 12:03:58,438 - mmcls - INFO - Epoch [7][30/100]	lr: 1.000e-03, eta: 0:06:39, time: 0.059, data_time: 0.002, memory: 737, loss: 2.9765
+2022-07-08 12:03:59,275 - mmcls - INFO - Epoch [7][40/100]	lr: 1.000e-03, eta: 0:06:36, time: 0.084, data_time: 0.001, memory: 737, loss: 3.0283
+2022-07-08 12:04:00,103 - mmcls - INFO - Epoch [7][50/100]	lr: 1.000e-03, eta: 0:06:33, time: 0.083, data_time: 0.001, memory: 737, loss: 3.0027
+2022-07-08 12:04:01,535 - mmcls - INFO - Epoch [7][60/100]	lr: 1.000e-03, eta: 0:06:33, time: 0.142, data_time: 0.000, memory: 737, loss: 2.9294
+2022-07-08 12:04:02,126 - mmcls - INFO - Epoch [7][70/100]	lr: 1.000e-03, eta: 0:06:29, time: 0.060, data_time: 0.002, memory: 737, loss: 2.9205
+2022-07-08 12:04:03,070 - mmcls - INFO - Epoch [7][80/100]	lr: 1.000e-03, eta: 0:06:27, time: 0.094, data_time: 0.032, memory: 737, loss: 3.0724
+2022-07-08 12:04:04,083 - mmcls - INFO - Epoch [7][90/100]	lr: 1.000e-03, eta: 0:06:25, time: 0.101, data_time: 0.033, memory: 737, loss: 3.0330
+2022-07-08 12:04:04,773 - mmcls - INFO - Epoch [7][100/100]	lr: 1.000e-03, eta: 0:06:22, time: 0.069, data_time: 0.001, memory: 737, loss: 2.9371
+2022-07-08 12:04:08,173 - mmcls - INFO - Epoch(val) [7][37]	mAP: 74.2032, ACC: 0.8521
+2022-07-08 12:04:11,746 - mmcls - INFO - Epoch [8][10/100]	lr: 1.000e-03, eta: 0:06:31, time: 0.356, data_time: 0.275, memory: 737, loss: 3.0102
+2022-07-08 12:04:12,606 - mmcls - INFO - Epoch [8][20/100]	lr: 1.000e-03, eta: 0:06:29, time: 0.086, data_time: 0.001, memory: 737, loss: 2.9315
+2022-07-08 12:04:13,219 - mmcls - INFO - Epoch [8][30/100]	lr: 1.000e-03, eta: 0:06:25, time: 0.061, data_time: 0.001, memory: 737, loss: 2.9723
+2022-07-08 12:04:14,170 - mmcls - INFO - Epoch [8][40/100]	lr: 1.000e-03, eta: 0:06:23, time: 0.095, data_time: 0.001, memory: 737, loss: 3.0590
+2022-07-08 12:04:15,101 - mmcls - INFO - Epoch [8][50/100]	lr: 1.000e-03, eta: 0:06:21, time: 0.092, data_time: 0.015, memory: 737, loss: 2.8380
+2022-07-08 12:04:16,247 - mmcls - INFO - Epoch [8][60/100]	lr: 1.000e-03, eta: 0:06:19, time: 0.116, data_time: 0.056, memory: 737, loss: 2.9254
+2022-07-08 12:04:17,059 - mmcls - INFO - Epoch [8][70/100]	lr: 1.000e-03, eta: 0:06:17, time: 0.080, data_time: 0.015, memory: 737, loss: 2.9484
+2022-07-08 12:04:18,249 - mmcls - INFO - Epoch [8][80/100]	lr: 1.000e-03, eta: 0:06:16, time: 0.119, data_time: 0.041, memory: 737, loss: 2.9746
+2022-07-08 12:04:18,874 - mmcls - INFO - Epoch [8][90/100]	lr: 1.000e-03, eta: 0:06:12, time: 0.062, data_time: 0.001, memory: 737, loss: 2.9131
+2022-07-08 12:04:19,885 - mmcls - INFO - Epoch [8][100/100]	lr: 1.000e-03, eta: 0:06:10, time: 0.102, data_time: 0.002, memory: 737, loss: 2.7747
+2022-07-08 12:04:23,368 - mmcls - INFO - Epoch(val) [8][37]	mAP: 74.9221, ACC: 0.8534
+2022-07-08 12:04:27,111 - mmcls - INFO - Epoch [9][10/100]	lr: 1.000e-03, eta: 0:06:19, time: 0.374, data_time: 0.317, memory: 737, loss: 2.7981
+2022-07-08 12:04:27,799 - mmcls - INFO - Epoch [9][20/100]	lr: 1.000e-03, eta: 0:06:16, time: 0.068, data_time: 0.001, memory: 737, loss: 2.8853
+2022-07-08 12:04:28,884 - mmcls - INFO - Epoch [9][30/100]	lr: 1.000e-03, eta: 0:06:15, time: 0.109, data_time: 0.047, memory: 737, loss: 2.9356
+2022-07-08 12:04:29,618 - mmcls - INFO - Epoch [9][40/100]	lr: 1.000e-03, eta: 0:06:12, time: 0.073, data_time: 0.003, memory: 737, loss: 2.8735
+2022-07-08 12:04:30,472 - mmcls - INFO - Epoch [9][50/100]	lr: 1.000e-03, eta: 0:06:09, time: 0.085, data_time: 0.005, memory: 737, loss: 2.8166
+2022-07-08 12:04:31,324 - mmcls - INFO - Epoch [9][60/100]	lr: 1.000e-03, eta: 0:06:07, time: 0.085, data_time: 0.001, memory: 737, loss: 2.9026
+2022-07-08 12:04:32,193 - mmcls - INFO - Epoch [9][70/100]	lr: 1.000e-03, eta: 0:06:05, time: 0.088, data_time: 0.002, memory: 737, loss: 2.9725
+2022-07-08 12:04:32,911 - mmcls - INFO - Epoch [9][80/100]	lr: 1.000e-03, eta: 0:06:02, time: 0.072, data_time: 0.003, memory: 737, loss: 2.9866
+2022-07-08 12:04:33,718 - mmcls - INFO - Epoch [9][90/100]	lr: 1.000e-03, eta: 0:06:00, time: 0.081, data_time: 0.001, memory: 737, loss: 3.0005
+2022-07-08 12:04:34,336 - mmcls - INFO - Epoch [9][100/100]	lr: 1.000e-03, eta: 0:05:57, time: 0.062, data_time: 0.001, memory: 737, loss: 2.8590
+2022-07-08 12:04:37,911 - mmcls - INFO - Epoch(val) [9][37]	mAP: 75.2483, ACC: 0.8534
+2022-07-08 12:04:41,069 - mmcls - INFO - Epoch [10][10/100]	lr: 1.000e-03, eta: 0:06:02, time: 0.315, data_time: 0.256, memory: 737, loss: 2.8672
+2022-07-08 12:04:41,784 - mmcls - INFO - Epoch [10][20/100]	lr: 1.000e-03, eta: 0:06:00, time: 0.071, data_time: 0.001, memory: 737, loss: 2.8722
+2022-07-08 12:04:42,590 - mmcls - INFO - Epoch [10][30/100]	lr: 1.000e-03, eta: 0:05:57, time: 0.081, data_time: 0.018, memory: 737, loss: 2.9359
+2022-07-08 12:04:43,309 - mmcls - INFO - Epoch [10][40/100]	lr: 1.000e-03, eta: 0:05:55, time: 0.072, data_time: 0.005, memory: 737, loss: 2.9238
+2022-07-08 12:04:44,384 - mmcls - INFO - Epoch [10][50/100]	lr: 1.000e-03, eta: 0:05:53, time: 0.107, data_time: 0.003, memory: 737, loss: 2.8251
+2022-07-08 12:04:45,278 - mmcls - INFO - Epoch [10][60/100]	lr: 1.000e-03, eta: 0:05:51, time: 0.089, data_time: 0.001, memory: 737, loss: 2.8089
+2022-07-08 12:04:46,044 - mmcls - INFO - Epoch [10][70/100]	lr: 1.000e-03, eta: 0:05:49, time: 0.075, data_time: 0.001, memory: 737, loss: 2.8824
+2022-07-08 12:04:46,816 - mmcls - INFO - Epoch [10][80/100]	lr: 1.000e-03, eta: 0:05:46, time: 0.078, data_time: 0.004, memory: 737, loss: 2.9007
+2022-07-08 12:04:47,932 - mmcls - INFO - Epoch [10][90/100]	lr: 1.000e-03, eta: 0:05:45, time: 0.111, data_time: 0.001, memory: 737, loss: 2.9109
+2022-07-08 12:04:48,736 - mmcls - INFO - Epoch [10][100/100]	lr: 1.000e-03, eta: 0:05:43, time: 0.081, data_time: 0.001, memory: 737, loss: 2.8570
+2022-07-08 12:04:48,738 - mmcls - INFO - Saving checkpoint at 10 epochs
+2022-07-08 12:04:52,643 - mmcls - INFO - Epoch(val) [10][37]	mAP: 75.7530, ACC: 0.8570
+2022-07-08 12:04:55,870 - mmcls - INFO - Epoch [11][10/100]	lr: 1.000e-03, eta: 0:05:48, time: 0.322, data_time: 0.240, memory: 737, loss: 2.7374
+2022-07-08 12:04:56,787 - mmcls - INFO - Epoch [11][20/100]	lr: 1.000e-03, eta: 0:05:46, time: 0.091, data_time: 0.031, memory: 737, loss: 2.8888
+2022-07-08 12:04:57,739 - mmcls - INFO - Epoch [11][30/100]	lr: 1.000e-03, eta: 0:05:44, time: 0.095, data_time: 0.016, memory: 737, loss: 2.8227
+2022-07-08 12:04:58,536 - mmcls - INFO - Epoch [11][40/100]	lr: 1.000e-03, eta: 0:05:42, time: 0.080, data_time: 0.019, memory: 737, loss: 2.8454
+2022-07-08 12:04:59,352 - mmcls - INFO - Epoch [11][50/100]	lr: 1.000e-03, eta: 0:05:40, time: 0.081, data_time: 0.001, memory: 737, loss: 2.8631
+2022-07-08 12:05:00,265 - mmcls - INFO - Epoch [11][60/100]	lr: 1.000e-03, eta: 0:05:38, time: 0.091, data_time: 0.001, memory: 737, loss: 2.7079
+2022-07-08 12:05:01,068 - mmcls - INFO - Epoch [11][70/100]	lr: 1.000e-03, eta: 0:05:36, time: 0.081, data_time: 0.002, memory: 737, loss: 2.8225
+2022-07-08 12:05:01,922 - mmcls - INFO - Epoch [11][80/100]	lr: 1.000e-03, eta: 0:05:34, time: 0.085, data_time: 0.003, memory: 737, loss: 2.7814
+2022-07-08 12:05:02,649 - mmcls - INFO - Epoch [11][90/100]	lr: 1.000e-03, eta: 0:05:32, time: 0.074, data_time: 0.002, memory: 737, loss: 2.8469
+2022-07-08 12:05:03,705 - mmcls - INFO - Epoch [11][100/100]	lr: 1.000e-03, eta: 0:05:31, time: 0.105, data_time: 0.001, memory: 737, loss: 2.7695
+2022-07-08 12:05:07,114 - mmcls - INFO - Epoch(val) [11][37]	mAP: 76.9606, ACC: 0.8597
+2022-07-08 12:05:10,568 - mmcls - INFO - Epoch [12][10/100]	lr: 1.000e-03, eta: 0:05:35, time: 0.344, data_time: 0.254, memory: 737, loss: 2.8274
+2022-07-08 12:05:11,150 - mmcls - INFO - Epoch [12][20/100]	lr: 1.000e-03, eta: 0:05:33, time: 0.058, data_time: 0.001, memory: 737, loss: 2.7251
+2022-07-08 12:05:12,324 - mmcls - INFO - Epoch [12][30/100]	lr: 1.000e-03, eta: 0:05:32, time: 0.118, data_time: 0.064, memory: 737, loss: 2.7463
+2022-07-08 12:05:13,124 - mmcls - INFO - Epoch [12][40/100]	lr: 1.000e-03, eta: 0:05:30, time: 0.080, data_time: 0.018, memory: 737, loss: 2.7554
+2022-07-08 12:05:13,898 - mmcls - INFO - Epoch [12][50/100]	lr: 1.000e-03, eta: 0:05:27, time: 0.077, data_time: 0.023, memory: 737, loss: 2.8102
+2022-07-08 12:05:14,875 - mmcls - INFO - Epoch [12][60/100]	lr: 1.000e-03, eta: 0:05:26, time: 0.099, data_time: 0.002, memory: 737, loss: 2.8521
+2022-07-08 12:05:15,841 - mmcls - INFO - Epoch [12][70/100]	lr: 1.000e-03, eta: 0:05:24, time: 0.096, data_time: 0.001, memory: 737, loss: 2.8739
+2022-07-08 12:05:16,731 - mmcls - INFO - Epoch [12][80/100]	lr: 1.000e-03, eta: 0:05:23, time: 0.089, data_time: 0.001, memory: 737, loss: 2.8426
+2022-07-08 12:05:17,338 - mmcls - INFO - Epoch [12][90/100]	lr: 1.000e-03, eta: 0:05:20, time: 0.061, data_time: 0.001, memory: 737, loss: 2.7630
+2022-07-08 12:05:18,388 - mmcls - INFO - Epoch [12][100/100]	lr: 1.000e-03, eta: 0:05:19, time: 0.104, data_time: 0.042, memory: 737, loss: 2.8104
+2022-07-08 12:05:21,779 - mmcls - INFO - Epoch(val) [12][37]	mAP: 77.2288, ACC: 0.8593
+2022-07-08 12:05:25,318 - mmcls - INFO - Epoch [13][10/100]	lr: 1.000e-03, eta: 0:05:23, time: 0.353, data_time: 0.284, memory: 737, loss: 2.8319
+2022-07-08 12:05:25,996 - mmcls - INFO - Epoch [13][20/100]	lr: 1.000e-03, eta: 0:05:21, time: 0.067, data_time: 0.011, memory: 737, loss: 2.8000
+2022-07-08 12:05:26,805 - mmcls - INFO - Epoch [13][30/100]	lr: 1.000e-03, eta: 0:05:19, time: 0.082, data_time: 0.019, memory: 737, loss: 2.7795
+2022-07-08 12:05:27,800 - mmcls - INFO - Epoch [13][40/100]	lr: 1.000e-03, eta: 0:05:17, time: 0.099, data_time: 0.002, memory: 737, loss: 2.8287
+2022-07-08 12:05:28,501 - mmcls - INFO - Epoch [13][50/100]	lr: 1.000e-03, eta: 0:05:15, time: 0.070, data_time: 0.001, memory: 737, loss: 2.7146
+2022-07-08 12:05:29,402 - mmcls - INFO - Epoch [13][60/100]	lr: 1.000e-03, eta: 0:05:14, time: 0.090, data_time: 0.001, memory: 737, loss: 2.7324
+2022-07-08 12:05:30,349 - mmcls - INFO - Epoch [13][70/100]	lr: 1.000e-03, eta: 0:05:12, time: 0.095, data_time: 0.001, memory: 737, loss: 2.6884
+2022-07-08 12:05:31,783 - mmcls - INFO - Epoch [13][80/100]	lr: 1.000e-03, eta: 0:05:11, time: 0.144, data_time: 0.068, memory: 737, loss: 2.8451
+2022-07-08 12:05:32,494 - mmcls - INFO - Epoch [13][90/100]	lr: 1.000e-03, eta: 0:05:09, time: 0.070, data_time: 0.001, memory: 737, loss: 2.7342
+2022-07-08 12:05:33,487 - mmcls - INFO - Epoch [13][100/100]	lr: 1.000e-03, eta: 0:05:08, time: 0.100, data_time: 0.002, memory: 737, loss: 2.7597
+2022-07-08 12:05:36,862 - mmcls - INFO - Epoch(val) [13][37]	mAP: 78.1151, ACC: 0.8616
+2022-07-08 12:05:40,033 - mmcls - INFO - Epoch [14][10/100]	lr: 1.000e-03, eta: 0:05:11, time: 0.316, data_time: 0.224, memory: 737, loss: 2.8193
+2022-07-08 12:05:41,300 - mmcls - INFO - Epoch [14][20/100]	lr: 1.000e-03, eta: 0:05:10, time: 0.126, data_time: 0.001, memory: 737, loss: 2.6782
+2022-07-08 12:05:42,003 - mmcls - INFO - Epoch [14][30/100]	lr: 1.000e-03, eta: 0:05:08, time: 0.071, data_time: 0.002, memory: 737, loss: 2.7156
+2022-07-08 12:05:42,761 - mmcls - INFO - Epoch [14][40/100]	lr: 1.000e-03, eta: 0:05:06, time: 0.075, data_time: 0.001, memory: 737, loss: 2.6976
+2022-07-08 12:05:43,794 - mmcls - INFO - Epoch [14][50/100]	lr: 1.000e-03, eta: 0:05:05, time: 0.104, data_time: 0.002, memory: 737, loss: 2.7673
+2022-07-08 12:05:44,657 - mmcls - INFO - Epoch [14][60/100]	lr: 1.000e-03, eta: 0:05:03, time: 0.086, data_time: 0.001, memory: 737, loss: 2.7826
+2022-07-08 12:05:45,477 - mmcls - INFO - Epoch [14][70/100]	lr: 1.000e-03, eta: 0:05:01, time: 0.082, data_time: 0.019, memory: 737, loss: 2.8076
+2022-07-08 12:05:46,712 - mmcls - INFO - Epoch [14][80/100]	lr: 1.000e-03, eta: 0:05:00, time: 0.124, data_time: 0.002, memory: 737, loss: 2.6477
+2022-07-08 12:05:47,570 - mmcls - INFO - Epoch [14][90/100]	lr: 1.000e-03, eta: 0:04:58, time: 0.086, data_time: 0.002, memory: 737, loss: 2.7098
+2022-07-08 12:05:48,331 - mmcls - INFO - Epoch [14][100/100]	lr: 1.000e-03, eta: 0:04:57, time: 0.076, data_time: 0.017, memory: 737, loss: 2.7357
+2022-07-08 12:05:51,750 - mmcls - INFO - Epoch(val) [14][37]	mAP: 78.3838, ACC: 0.8626
+2022-07-08 12:05:54,845 - mmcls - INFO - Epoch [15][10/100]	lr: 1.000e-03, eta: 0:04:59, time: 0.308, data_time: 0.226, memory: 737, loss: 2.7367
+2022-07-08 12:05:55,729 - mmcls - INFO - Epoch [15][20/100]	lr: 1.000e-03, eta: 0:04:57, time: 0.088, data_time: 0.001, memory: 737, loss: 2.7512
+2022-07-08 12:05:56,590 - mmcls - INFO - Epoch [15][30/100]	lr: 1.000e-03, eta: 0:04:56, time: 0.086, data_time: 0.002, memory: 737, loss: 2.6652
+2022-07-08 12:05:57,357 - mmcls - INFO - Epoch [15][40/100]	lr: 1.000e-03, eta: 0:04:54, time: 0.077, data_time: 0.001, memory: 737, loss: 2.8059
+2022-07-08 12:05:58,454 - mmcls - INFO - Epoch [15][50/100]	lr: 1.000e-03, eta: 0:04:53, time: 0.109, data_time: 0.001, memory: 737, loss: 2.6866
+2022-07-08 12:05:59,277 - mmcls - INFO - Epoch [15][60/100]	lr: 1.000e-03, eta: 0:04:51, time: 0.083, data_time: 0.002, memory: 737, loss: 2.7748
+2022-07-08 12:06:00,048 - mmcls - INFO - Epoch [15][70/100]	lr: 1.000e-03, eta: 0:04:49, time: 0.078, data_time: 0.004, memory: 737, loss: 2.7424
+2022-07-08 12:06:00,830 - mmcls - INFO - Epoch [15][80/100]	lr: 1.000e-03, eta: 0:04:47, time: 0.077, data_time: 0.017, memory: 737, loss: 2.6541
+2022-07-08 12:06:01,950 - mmcls - INFO - Epoch [15][90/100]	lr: 1.000e-03, eta: 0:04:46, time: 0.112, data_time: 0.052, memory: 737, loss: 2.6132
+2022-07-08 12:06:02,670 - mmcls - INFO - Epoch [15][100/100]	lr: 1.000e-03, eta: 0:04:44, time: 0.072, data_time: 0.016, memory: 737, loss: 2.7749
+2022-07-08 12:06:06,061 - mmcls - INFO - Epoch(val) [15][37]	mAP: 78.7758, ACC: 0.8621
+2022-07-08 12:06:09,371 - mmcls - INFO - Epoch [16][10/100]	lr: 1.000e-03, eta: 0:04:47, time: 0.330, data_time: 0.264, memory: 737, loss: 2.7064
+2022-07-08 12:06:10,212 - mmcls - INFO - Epoch [16][20/100]	lr: 1.000e-03, eta: 0:04:45, time: 0.085, data_time: 0.003, memory: 737, loss: 2.6904
+2022-07-08 12:06:10,971 - mmcls - INFO - Epoch [16][30/100]	lr: 1.000e-03, eta: 0:04:43, time: 0.075, data_time: 0.016, memory: 737, loss: 2.5948
+2022-07-08 12:06:11,631 - mmcls - INFO - Epoch [16][40/100]	lr: 1.000e-03, eta: 0:04:41, time: 0.066, data_time: 0.001, memory: 737, loss: 2.8364
+2022-07-08 12:06:12,356 - mmcls - INFO - Epoch [16][50/100]	lr: 1.000e-03, eta: 0:04:40, time: 0.072, data_time: 0.001, memory: 737, loss: 2.7166
+2022-07-08 12:06:13,399 - mmcls - INFO - Epoch [16][60/100]	lr: 1.000e-03, eta: 0:04:38, time: 0.105, data_time: 0.002, memory: 737, loss: 2.6106
+2022-07-08 12:06:14,026 - mmcls - INFO - Epoch [16][70/100]	lr: 1.000e-03, eta: 0:04:36, time: 0.063, data_time: 0.002, memory: 737, loss: 2.5944
+2022-07-08 12:06:14,937 - mmcls - INFO - Epoch [16][80/100]	lr: 1.000e-03, eta: 0:04:35, time: 0.091, data_time: 0.002, memory: 737, loss: 2.7697
+2022-07-08 12:06:15,791 - mmcls - INFO - Epoch [16][90/100]	lr: 1.000e-03, eta: 0:04:33, time: 0.085, data_time: 0.001, memory: 737, loss: 2.6051
+2022-07-08 12:06:16,489 - mmcls - INFO - Epoch [16][100/100]	lr: 1.000e-03, eta: 0:04:31, time: 0.070, data_time: 0.002, memory: 737, loss: 2.6336
+2022-07-08 12:06:19,878 - mmcls - INFO - Epoch(val) [16][37]	mAP: 79.2762, ACC: 0.8650
+2022-07-08 12:06:23,324 - mmcls - INFO - Epoch [17][10/100]	lr: 1.000e-03, eta: 0:04:34, time: 0.343, data_time: 0.241, memory: 737, loss: 2.6757
+2022-07-08 12:06:24,091 - mmcls - INFO - Epoch [17][20/100]	lr: 1.000e-03, eta: 0:04:32, time: 0.078, data_time: 0.002, memory: 737, loss: 2.6462
+2022-07-08 12:06:25,102 - mmcls - INFO - Epoch [17][30/100]	lr: 1.000e-03, eta: 0:04:31, time: 0.100, data_time: 0.001, memory: 737, loss: 2.7364
+2022-07-08 12:06:25,844 - mmcls - INFO - Epoch [17][40/100]	lr: 1.000e-03, eta: 0:04:29, time: 0.074, data_time: 0.001, memory: 737, loss: 2.7268
+2022-07-08 12:06:26,709 - mmcls - INFO - Epoch [17][50/100]	lr: 1.000e-03, eta: 0:04:27, time: 0.087, data_time: 0.027, memory: 737, loss: 2.6109
+2022-07-08 12:06:27,682 - mmcls - INFO - Epoch [17][60/100]	lr: 1.000e-03, eta: 0:04:26, time: 0.097, data_time: 0.037, memory: 737, loss: 2.6320
+2022-07-08 12:06:28,527 - mmcls - INFO - Epoch [17][70/100]	lr: 1.000e-03, eta: 0:04:24, time: 0.084, data_time: 0.002, memory: 737, loss: 2.6457
+2022-07-08 12:06:29,651 - mmcls - INFO - Epoch [17][80/100]	lr: 1.000e-03, eta: 0:04:23, time: 0.113, data_time: 0.002, memory: 737, loss: 2.6544
+2022-07-08 12:06:30,428 - mmcls - INFO - Epoch [17][90/100]	lr: 1.000e-03, eta: 0:04:22, time: 0.078, data_time: 0.002, memory: 737, loss: 2.6285
+2022-07-08 12:06:31,162 - mmcls - INFO - Epoch [17][100/100]	lr: 1.000e-03, eta: 0:04:20, time: 0.073, data_time: 0.001, memory: 737, loss: 2.6583
+2022-07-08 12:06:34,576 - mmcls - INFO - Epoch(val) [17][37]	mAP: 79.3109, ACC: 0.8646
+2022-07-08 12:06:38,007 - mmcls - INFO - Epoch [18][10/100]	lr: 1.000e-03, eta: 0:04:22, time: 0.342, data_time: 0.230, memory: 737, loss: 2.4981
+2022-07-08 12:06:38,755 - mmcls - INFO - Epoch [18][20/100]	lr: 1.000e-03, eta: 0:04:20, time: 0.075, data_time: 0.018, memory: 737, loss: 2.5827
+2022-07-08 12:06:39,553 - mmcls - INFO - Epoch [18][30/100]	lr: 1.000e-03, eta: 0:04:19, time: 0.079, data_time: 0.022, memory: 737, loss: 2.6354
+2022-07-08 12:06:40,535 - mmcls - INFO - Epoch [18][40/100]	lr: 1.000e-03, eta: 0:04:17, time: 0.098, data_time: 0.002, memory: 737, loss: 2.6858
+2022-07-08 12:06:41,436 - mmcls - INFO - Epoch [18][50/100]	lr: 1.000e-03, eta: 0:04:16, time: 0.090, data_time: 0.002, memory: 737, loss: 2.6447
+2022-07-08 12:06:42,327 - mmcls - INFO - Epoch [18][60/100]	lr: 1.000e-03, eta: 0:04:14, time: 0.090, data_time: 0.023, memory: 737, loss: 2.5796
+2022-07-08 12:06:43,223 - mmcls - INFO - Epoch [18][70/100]	lr: 1.000e-03, eta: 0:04:13, time: 0.091, data_time: 0.002, memory: 737, loss: 2.6935
+2022-07-08 12:06:44,050 - mmcls - INFO - Epoch [18][80/100]	lr: 1.000e-03, eta: 0:04:11, time: 0.082, data_time: 0.006, memory: 737, loss: 2.5537
+2022-07-08 12:06:44,871 - mmcls - INFO - Epoch [18][90/100]	lr: 1.000e-03, eta: 0:04:10, time: 0.081, data_time: 0.013, memory: 737, loss: 2.6484
+2022-07-08 12:06:45,913 - mmcls - INFO - Epoch [18][100/100]	lr: 1.000e-03, eta: 0:04:09, time: 0.106, data_time: 0.003, memory: 737, loss: 2.5690
+2022-07-08 12:06:49,302 - mmcls - INFO - Epoch(val) [18][37]	mAP: 79.6777, ACC: 0.8651
+2022-07-08 12:06:52,724 - mmcls - INFO - Epoch [19][10/100]	lr: 1.000e-03, eta: 0:04:10, time: 0.340, data_time: 0.237, memory: 737, loss: 2.5107
+2022-07-08 12:06:53,524 - mmcls - INFO - Epoch [19][20/100]	lr: 1.000e-03, eta: 0:04:09, time: 0.080, data_time: 0.014, memory: 737, loss: 2.5792
+2022-07-08 12:06:54,252 - mmcls - INFO - Epoch [19][30/100]	lr: 1.000e-03, eta: 0:04:07, time: 0.074, data_time: 0.008, memory: 737, loss: 2.5811
+2022-07-08 12:06:55,300 - mmcls - INFO - Epoch [19][40/100]	lr: 1.000e-03, eta: 0:04:06, time: 0.105, data_time: 0.021, memory: 737, loss: 2.6181
+2022-07-08 12:06:56,364 - mmcls - INFO - Epoch [19][50/100]	lr: 1.000e-03, eta: 0:04:05, time: 0.106, data_time: 0.001, memory: 737, loss: 2.5887
+2022-07-08 12:06:57,091 - mmcls - INFO - Epoch [19][60/100]	lr: 1.000e-03, eta: 0:04:03, time: 0.073, data_time: 0.002, memory: 737, loss: 2.6413
+2022-07-08 12:06:58,126 - mmcls - INFO - Epoch [19][70/100]	lr: 1.000e-03, eta: 0:04:02, time: 0.103, data_time: 0.001, memory: 737, loss: 2.4705
+2022-07-08 12:06:59,399 - mmcls - INFO - Epoch [19][80/100]	lr: 1.000e-03, eta: 0:04:01, time: 0.127, data_time: 0.002, memory: 737, loss: 2.5770
+2022-07-08 12:07:00,172 - mmcls - INFO - Epoch [19][90/100]	lr: 1.000e-03, eta: 0:03:59, time: 0.078, data_time: 0.002, memory: 737, loss: 2.6569
+2022-07-08 12:07:00,775 - mmcls - INFO - Epoch [19][100/100]	lr: 1.000e-03, eta: 0:03:58, time: 0.060, data_time: 0.001, memory: 737, loss: 2.6553
+2022-07-08 12:07:04,277 - mmcls - INFO - Epoch(val) [19][37]	mAP: 79.4227, ACC: 0.8607
+2022-07-08 12:07:07,551 - mmcls - INFO - Epoch [20][10/100]	lr: 1.000e-03, eta: 0:03:59, time: 0.327, data_time: 0.232, memory: 737, loss: 2.5455
+2022-07-08 12:07:08,247 - mmcls - INFO - Epoch [20][20/100]	lr: 1.000e-03, eta: 0:03:57, time: 0.069, data_time: 0.001, memory: 737, loss: 2.5062
+2022-07-08 12:07:09,294 - mmcls - INFO - Epoch [20][30/100]	lr: 1.000e-03, eta: 0:03:56, time: 0.104, data_time: 0.045, memory: 737, loss: 2.5719
+2022-07-08 12:07:09,983 - mmcls - INFO - Epoch [20][40/100]	lr: 1.000e-03, eta: 0:03:54, time: 0.070, data_time: 0.010, memory: 737, loss: 2.3801
+2022-07-08 12:07:10,757 - mmcls - INFO - Epoch [20][50/100]	lr: 1.000e-03, eta: 0:03:53, time: 0.077, data_time: 0.006, memory: 737, loss: 2.6181
+2022-07-08 12:07:11,515 - mmcls - INFO - Epoch [20][60/100]	lr: 1.000e-03, eta: 0:03:51, time: 0.076, data_time: 0.002, memory: 737, loss: 2.6324
+2022-07-08 12:07:12,344 - mmcls - INFO - Epoch [20][70/100]	lr: 1.000e-03, eta: 0:03:50, time: 0.082, data_time: 0.001, memory: 737, loss: 2.5467
+2022-07-08 12:07:13,351 - mmcls - INFO - Epoch [20][80/100]	lr: 1.000e-03, eta: 0:03:48, time: 0.100, data_time: 0.002, memory: 737, loss: 2.6196
+2022-07-08 12:07:14,214 - mmcls - INFO - Epoch [20][90/100]	lr: 1.000e-03, eta: 0:03:47, time: 0.087, data_time: 0.025, memory: 737, loss: 2.6461
+2022-07-08 12:07:14,944 - mmcls - INFO - Epoch [20][100/100]	lr: 1.000e-03, eta: 0:03:45, time: 0.073, data_time: 0.001, memory: 737, loss: 2.6381
+2022-07-08 12:07:14,945 - mmcls - INFO - Saving checkpoint at 20 epochs
+2022-07-08 12:07:18,586 - mmcls - INFO - Epoch(val) [20][37]	mAP: 80.1499, ACC: 0.8648
+2022-07-08 12:07:22,202 - mmcls - INFO - Epoch [21][10/100]	lr: 1.000e-04, eta: 0:03:47, time: 0.360, data_time: 0.227, memory: 737, loss: 2.5241
+2022-07-08 12:07:23,012 - mmcls - INFO - Epoch [21][20/100]	lr: 1.000e-04, eta: 0:03:45, time: 0.081, data_time: 0.001, memory: 737, loss: 2.6541
+2022-07-08 12:07:24,034 - mmcls - INFO - Epoch [21][30/100]	lr: 1.000e-04, eta: 0:03:44, time: 0.103, data_time: 0.002, memory: 737, loss: 2.5335
+2022-07-08 12:07:24,760 - mmcls - INFO - Epoch [21][40/100]	lr: 1.000e-04, eta: 0:03:43, time: 0.072, data_time: 0.009, memory: 737, loss: 2.6870
+2022-07-08 12:07:25,979 - mmcls - INFO - Epoch [21][50/100]	lr: 1.000e-04, eta: 0:03:41, time: 0.123, data_time: 0.004, memory: 737, loss: 2.5132
+2022-07-08 12:07:26,991 - mmcls - INFO - Epoch [21][60/100]	lr: 1.000e-04, eta: 0:03:40, time: 0.100, data_time: 0.001, memory: 737, loss: 2.4649
+2022-07-08 12:07:27,871 - mmcls - INFO - Epoch [21][70/100]	lr: 1.000e-04, eta: 0:03:39, time: 0.087, data_time: 0.001, memory: 737, loss: 2.4641
+2022-07-08 12:07:28,578 - mmcls - INFO - Epoch [21][80/100]	lr: 1.000e-04, eta: 0:03:37, time: 0.071, data_time: 0.004, memory: 737, loss: 2.4985
+2022-07-08 12:07:29,400 - mmcls - INFO - Epoch [21][90/100]	lr: 1.000e-04, eta: 0:03:36, time: 0.083, data_time: 0.010, memory: 737, loss: 2.5554
+2022-07-08 12:07:30,334 - mmcls - INFO - Epoch [21][100/100]	lr: 1.000e-04, eta: 0:03:35, time: 0.093, data_time: 0.037, memory: 737, loss: 2.5769
+2022-07-08 12:07:33,870 - mmcls - INFO - Epoch(val) [21][37]	mAP: 80.2249, ACC: 0.8659
+2022-07-08 12:07:37,270 - mmcls - INFO - Epoch [22][10/100]	lr: 1.000e-04, eta: 0:03:35, time: 0.340, data_time: 0.245, memory: 737, loss: 2.5640
+2022-07-08 12:07:37,984 - mmcls - INFO - Epoch [22][20/100]	lr: 1.000e-04, eta: 0:03:34, time: 0.071, data_time: 0.011, memory: 737, loss: 2.6462
+2022-07-08 12:07:38,904 - mmcls - INFO - Epoch [22][30/100]	lr: 1.000e-04, eta: 0:03:33, time: 0.092, data_time: 0.013, memory: 737, loss: 2.4867
+2022-07-08 12:07:39,731 - mmcls - INFO - Epoch [22][40/100]	lr: 1.000e-04, eta: 0:03:31, time: 0.083, data_time: 0.020, memory: 737, loss: 2.5842
+2022-07-08 12:07:40,604 - mmcls - INFO - Epoch [22][50/100]	lr: 1.000e-04, eta: 0:03:30, time: 0.087, data_time: 0.001, memory: 737, loss: 2.4986
+2022-07-08 12:07:41,330 - mmcls - INFO - Epoch [22][60/100]	lr: 1.000e-04, eta: 0:03:28, time: 0.073, data_time: 0.001, memory: 737, loss: 2.4792
+2022-07-08 12:07:42,087 - mmcls - INFO - Epoch [22][70/100]	lr: 1.000e-04, eta: 0:03:27, time: 0.074, data_time: 0.001, memory: 737, loss: 2.4082
+2022-07-08 12:07:43,204 - mmcls - INFO - Epoch [22][80/100]	lr: 1.000e-04, eta: 0:03:26, time: 0.112, data_time: 0.034, memory: 737, loss: 2.6217
+2022-07-08 12:07:44,043 - mmcls - INFO - Epoch [22][90/100]	lr: 1.000e-04, eta: 0:03:24, time: 0.084, data_time: 0.002, memory: 737, loss: 2.5502
+2022-07-08 12:07:44,858 - mmcls - INFO - Epoch [22][100/100]	lr: 1.000e-04, eta: 0:03:23, time: 0.082, data_time: 0.002, memory: 737, loss: 2.4593
+2022-07-08 12:07:48,300 - mmcls - INFO - Epoch(val) [22][37]	mAP: 80.2436, ACC: 0.8663
+2022-07-08 12:07:51,773 - mmcls - INFO - Epoch [23][10/100]	lr: 1.000e-04, eta: 0:03:24, time: 0.347, data_time: 0.221, memory: 737, loss: 2.5099
+2022-07-08 12:07:52,478 - mmcls - INFO - Epoch [23][20/100]	lr: 1.000e-04, eta: 0:03:22, time: 0.070, data_time: 0.000, memory: 737, loss: 2.6206
+2022-07-08 12:07:53,441 - mmcls - INFO - Epoch [23][30/100]	lr: 1.000e-04, eta: 0:03:21, time: 0.096, data_time: 0.001, memory: 737, loss: 2.4449
+2022-07-08 12:07:54,193 - mmcls - INFO - Epoch [23][40/100]	lr: 1.000e-04, eta: 0:03:20, time: 0.075, data_time: 0.016, memory: 737, loss: 2.4292
+2022-07-08 12:07:55,089 - mmcls - INFO - Epoch [23][50/100]	lr: 1.000e-04, eta: 0:03:18, time: 0.090, data_time: 0.005, memory: 737, loss: 2.5112
+2022-07-08 12:07:55,798 - mmcls - INFO - Epoch [23][60/100]	lr: 1.000e-04, eta: 0:03:17, time: 0.070, data_time: 0.012, memory: 737, loss: 2.5071
+2022-07-08 12:07:56,616 - mmcls - INFO - Epoch [23][70/100]	lr: 1.000e-04, eta: 0:03:15, time: 0.082, data_time: 0.001, memory: 737, loss: 2.6154
+2022-07-08 12:07:57,357 - mmcls - INFO - Epoch [23][80/100]	lr: 1.000e-04, eta: 0:03:14, time: 0.073, data_time: 0.015, memory: 737, loss: 2.5620
+2022-07-08 12:07:58,749 - mmcls - INFO - Epoch [23][90/100]	lr: 1.000e-04, eta: 0:03:13, time: 0.140, data_time: 0.085, memory: 737, loss: 2.5792
+2022-07-08 12:07:59,508 - mmcls - INFO - Epoch [23][100/100]	lr: 1.000e-04, eta: 0:03:12, time: 0.076, data_time: 0.020, memory: 737, loss: 2.4865
+2022-07-08 12:08:02,949 - mmcls - INFO - Epoch(val) [23][37]	mAP: 80.3491, ACC: 0.8672
+2022-07-08 12:08:06,410 - mmcls - INFO - Epoch [24][10/100]	lr: 1.000e-04, eta: 0:03:12, time: 0.345, data_time: 0.216, memory: 737, loss: 2.5670
+2022-07-08 12:08:07,034 - mmcls - INFO - Epoch [24][20/100]	lr: 1.000e-04, eta: 0:03:11, time: 0.062, data_time: 0.001, memory: 737, loss: 2.5991
+2022-07-08 12:08:08,527 - mmcls - INFO - Epoch [24][30/100]	lr: 1.000e-04, eta: 0:03:10, time: 0.150, data_time: 0.078, memory: 737, loss: 2.5517
+2022-07-08 12:08:09,383 - mmcls - INFO - Epoch [24][40/100]	lr: 1.000e-04, eta: 0:03:08, time: 0.086, data_time: 0.029, memory: 737, loss: 2.5855
+2022-07-08 12:08:10,430 - mmcls - INFO - Epoch [24][50/100]	lr: 1.000e-04, eta: 0:03:07, time: 0.105, data_time: 0.046, memory: 737, loss: 2.5334
+2022-07-08 12:08:11,532 - mmcls - INFO - Epoch [24][60/100]	lr: 1.000e-04, eta: 0:03:06, time: 0.110, data_time: 0.002, memory: 737, loss: 2.5460
+2022-07-08 12:08:12,155 - mmcls - INFO - Epoch [24][70/100]	lr: 1.000e-04, eta: 0:03:05, time: 0.062, data_time: 0.001, memory: 737, loss: 2.4559
+2022-07-08 12:08:12,917 - mmcls - INFO - Epoch [24][80/100]	lr: 1.000e-04, eta: 0:03:03, time: 0.076, data_time: 0.001, memory: 737, loss: 2.4387
+2022-07-08 12:08:13,837 - mmcls - INFO - Epoch [24][90/100]	lr: 1.000e-04, eta: 0:03:02, time: 0.092, data_time: 0.002, memory: 737, loss: 2.4746
+2022-07-08 12:08:14,894 - mmcls - INFO - Epoch [24][100/100]	lr: 1.000e-04, eta: 0:03:01, time: 0.106, data_time: 0.001, memory: 737, loss: 2.4632
+2022-07-08 12:08:18,420 - mmcls - INFO - Epoch(val) [24][37]	mAP: 80.3209, ACC: 0.8665
+2022-07-08 12:08:21,770 - mmcls - INFO - Epoch [25][10/100]	lr: 1.000e-04, eta: 0:03:01, time: 0.334, data_time: 0.237, memory: 737, loss: 2.4937
+2022-07-08 12:08:22,662 - mmcls - INFO - Epoch [25][20/100]	lr: 1.000e-04, eta: 0:03:00, time: 0.089, data_time: 0.003, memory: 737, loss: 2.5670
+2022-07-08 12:08:23,627 - mmcls - INFO - Epoch [25][30/100]	lr: 1.000e-04, eta: 0:02:58, time: 0.095, data_time: 0.001, memory: 737, loss: 2.6156
+2022-07-08 12:08:24,464 - mmcls - INFO - Epoch [25][40/100]	lr: 1.000e-04, eta: 0:02:57, time: 0.084, data_time: 0.002, memory: 737, loss: 2.4221
+2022-07-08 12:08:25,145 - mmcls - INFO - Epoch [25][50/100]	lr: 1.000e-04, eta: 0:02:56, time: 0.068, data_time: 0.002, memory: 737, loss: 2.4783
+2022-07-08 12:08:26,138 - mmcls - INFO - Epoch [25][60/100]	lr: 1.000e-04, eta: 0:02:54, time: 0.099, data_time: 0.001, memory: 737, loss: 2.5303
+2022-07-08 12:08:26,888 - mmcls - INFO - Epoch [25][70/100]	lr: 1.000e-04, eta: 0:02:53, time: 0.075, data_time: 0.001, memory: 737, loss: 2.5399
+2022-07-08 12:08:27,695 - mmcls - INFO - Epoch [25][80/100]	lr: 1.000e-04, eta: 0:02:52, time: 0.080, data_time: 0.001, memory: 737, loss: 2.6017
+2022-07-08 12:08:28,609 - mmcls - INFO - Epoch [25][90/100]	lr: 1.000e-04, eta: 0:02:51, time: 0.092, data_time: 0.002, memory: 737, loss: 2.5619
+2022-07-08 12:08:29,509 - mmcls - INFO - Epoch [25][100/100]	lr: 1.000e-04, eta: 0:02:49, time: 0.090, data_time: 0.001, memory: 737, loss: 2.6196
+2022-07-08 12:08:32,971 - mmcls - INFO - Epoch(val) [25][37]	mAP: 80.3291, ACC: 0.8671
+2022-07-08 12:08:36,184 - mmcls - INFO - Epoch [26][10/100]	lr: 1.000e-04, eta: 0:02:49, time: 0.320, data_time: 0.232, memory: 737, loss: 2.4625
+2022-07-08 12:08:37,045 - mmcls - INFO - Epoch [26][20/100]	lr: 1.000e-04, eta: 0:02:48, time: 0.087, data_time: 0.002, memory: 737, loss: 2.6189
+2022-07-08 12:08:38,033 - mmcls - INFO - Epoch [26][30/100]	lr: 1.000e-04, eta: 0:02:47, time: 0.099, data_time: 0.000, memory: 737, loss: 2.4816
+2022-07-08 12:08:38,831 - mmcls - INFO - Epoch [26][40/100]	lr: 1.000e-04, eta: 0:02:45, time: 0.080, data_time: 0.014, memory: 737, loss: 2.6132
+2022-07-08 12:08:39,872 - mmcls - INFO - Epoch [26][50/100]	lr: 1.000e-04, eta: 0:02:44, time: 0.104, data_time: 0.000, memory: 737, loss: 2.5228
+2022-07-08 12:08:40,599 - mmcls - INFO - Epoch [26][60/100]	lr: 1.000e-04, eta: 0:02:43, time: 0.072, data_time: 0.003, memory: 737, loss: 2.5500
+2022-07-08 12:08:41,793 - mmcls - INFO - Epoch [26][70/100]	lr: 1.000e-04, eta: 0:02:42, time: 0.120, data_time: 0.053, memory: 737, loss: 2.5544
+2022-07-08 12:08:42,616 - mmcls - INFO - Epoch [26][80/100]	lr: 1.000e-04, eta: 0:02:41, time: 0.083, data_time: 0.024, memory: 737, loss: 2.5012
+2022-07-08 12:08:43,659 - mmcls - INFO - Epoch [26][90/100]	lr: 1.000e-04, eta: 0:02:39, time: 0.104, data_time: 0.043, memory: 737, loss: 2.4080
+2022-07-08 12:08:44,404 - mmcls - INFO - Epoch [26][100/100]	lr: 1.000e-04, eta: 0:02:38, time: 0.074, data_time: 0.003, memory: 737, loss: 2.5178
+2022-07-08 12:08:47,834 - mmcls - INFO - Epoch(val) [26][37]	mAP: 80.4168, ACC: 0.8678
+2022-07-08 12:08:50,974 - mmcls - INFO - Epoch [27][10/100]	lr: 1.000e-04, eta: 0:02:38, time: 0.312, data_time: 0.227, memory: 737, loss: 2.5121
+2022-07-08 12:08:51,871 - mmcls - INFO - Epoch [27][20/100]	lr: 1.000e-04, eta: 0:02:37, time: 0.091, data_time: 0.012, memory: 737, loss: 2.5299
+2022-07-08 12:08:52,624 - mmcls - INFO - Epoch [27][30/100]	lr: 1.000e-04, eta: 0:02:35, time: 0.075, data_time: 0.001, memory: 737, loss: 2.3973
+2022-07-08 12:08:53,771 - mmcls - INFO - Epoch [27][40/100]	lr: 1.000e-04, eta: 0:02:34, time: 0.114, data_time: 0.041, memory: 737, loss: 2.5433
+2022-07-08 12:08:54,582 - mmcls - INFO - Epoch [27][50/100]	lr: 1.000e-04, eta: 0:02:33, time: 0.081, data_time: 0.003, memory: 737, loss: 2.5824
+2022-07-08 12:08:55,681 - mmcls - INFO - Epoch [27][60/100]	lr: 1.000e-04, eta: 0:02:32, time: 0.111, data_time: 0.038, memory: 737, loss: 2.3972
+2022-07-08 12:08:56,463 - mmcls - INFO - Epoch [27][70/100]	lr: 1.000e-04, eta: 0:02:30, time: 0.077, data_time: 0.011, memory: 737, loss: 2.5836
+2022-07-08 12:08:57,192 - mmcls - INFO - Epoch [27][80/100]	lr: 1.000e-04, eta: 0:02:29, time: 0.074, data_time: 0.004, memory: 737, loss: 2.5958
+2022-07-08 12:08:57,983 - mmcls - INFO - Epoch [27][90/100]	lr: 1.000e-04, eta: 0:02:28, time: 0.078, data_time: 0.001, memory: 737, loss: 2.5583
+2022-07-08 12:08:59,038 - mmcls - INFO - Epoch [27][100/100]	lr: 1.000e-04, eta: 0:02:27, time: 0.106, data_time: 0.001, memory: 737, loss: 2.4770
+2022-07-08 12:09:02,488 - mmcls - INFO - Epoch(val) [27][37]	mAP: 80.3915, ACC: 0.8670
+2022-07-08 12:09:05,872 - mmcls - INFO - Epoch [28][10/100]	lr: 1.000e-04, eta: 0:02:27, time: 0.336, data_time: 0.223, memory: 737, loss: 2.4901
+2022-07-08 12:09:06,769 - mmcls - INFO - Epoch [28][20/100]	lr: 1.000e-04, eta: 0:02:25, time: 0.090, data_time: 0.009, memory: 737, loss: 2.5315
+2022-07-08 12:09:07,819 - mmcls - INFO - Epoch [28][30/100]	lr: 1.000e-04, eta: 0:02:24, time: 0.105, data_time: 0.047, memory: 737, loss: 2.4949
+2022-07-08 12:09:08,746 - mmcls - INFO - Epoch [28][40/100]	lr: 1.000e-04, eta: 0:02:23, time: 0.094, data_time: 0.036, memory: 737, loss: 2.4733
+2022-07-08 12:09:09,642 - mmcls - INFO - Epoch [28][50/100]	lr: 1.000e-04, eta: 0:02:22, time: 0.089, data_time: 0.001, memory: 737, loss: 2.6119
+2022-07-08 12:09:10,415 - mmcls - INFO - Epoch [28][60/100]	lr: 1.000e-04, eta: 0:02:20, time: 0.077, data_time: 0.018, memory: 737, loss: 2.5302
+2022-07-08 12:09:11,144 - mmcls - INFO - Epoch [28][70/100]	lr: 1.000e-04, eta: 0:02:19, time: 0.073, data_time: 0.002, memory: 737, loss: 2.4817
+2022-07-08 12:09:12,078 - mmcls - INFO - Epoch [28][80/100]	lr: 1.000e-04, eta: 0:02:18, time: 0.093, data_time: 0.002, memory: 737, loss: 2.6341
+2022-07-08 12:09:12,833 - mmcls - INFO - Epoch [28][90/100]	lr: 1.000e-04, eta: 0:02:16, time: 0.076, data_time: 0.002, memory: 737, loss: 2.4924
+2022-07-08 12:09:13,467 - mmcls - INFO - Epoch [28][100/100]	lr: 1.000e-04, eta: 0:02:15, time: 0.064, data_time: 0.006, memory: 737, loss: 2.5536
+2022-07-08 12:09:16,906 - mmcls - INFO - Epoch(val) [28][37]	mAP: 80.4133, ACC: 0.8671
+2022-07-08 12:09:20,385 - mmcls - INFO - Epoch [29][10/100]	lr: 1.000e-04, eta: 0:02:15, time: 0.345, data_time: 0.277, memory: 737, loss: 2.4279
+2022-07-08 12:09:21,214 - mmcls - INFO - Epoch [29][20/100]	lr: 1.000e-04, eta: 0:02:14, time: 0.085, data_time: 0.012, memory: 737, loss: 2.4596
+2022-07-08 12:09:21,934 - mmcls - INFO - Epoch [29][30/100]	lr: 1.000e-04, eta: 0:02:12, time: 0.071, data_time: 0.001, memory: 737, loss: 2.4135
+2022-07-08 12:09:22,741 - mmcls - INFO - Epoch [29][40/100]	lr: 1.000e-04, eta: 0:02:11, time: 0.081, data_time: 0.002, memory: 737, loss: 2.5783
+2022-07-08 12:09:23,429 - mmcls - INFO - Epoch [29][50/100]	lr: 1.000e-04, eta: 0:02:10, time: 0.069, data_time: 0.001, memory: 737, loss: 2.4984
+2022-07-08 12:09:24,692 - mmcls - INFO - Epoch [29][60/100]	lr: 1.000e-04, eta: 0:02:09, time: 0.127, data_time: 0.011, memory: 737, loss: 2.6109
+2022-07-08 12:09:25,445 - mmcls - INFO - Epoch [29][70/100]	lr: 1.000e-04, eta: 0:02:07, time: 0.073, data_time: 0.001, memory: 737, loss: 2.5224
+2022-07-08 12:09:26,138 - mmcls - INFO - Epoch [29][80/100]	lr: 1.000e-04, eta: 0:02:06, time: 0.070, data_time: 0.002, memory: 737, loss: 2.5790
+2022-07-08 12:09:26,837 - mmcls - INFO - Epoch [29][90/100]	lr: 1.000e-04, eta: 0:02:05, time: 0.070, data_time: 0.003, memory: 737, loss: 2.4922
+2022-07-08 12:09:27,729 - mmcls - INFO - Epoch [29][100/100]	lr: 1.000e-04, eta: 0:02:04, time: 0.089, data_time: 0.002, memory: 737, loss: 2.5156
+2022-07-08 12:09:31,118 - mmcls - INFO - Epoch(val) [29][37]	mAP: 80.5053, ACC: 0.8677
+2022-07-08 12:09:34,562 - mmcls - INFO - Epoch [30][10/100]	lr: 1.000e-04, eta: 0:02:03, time: 0.344, data_time: 0.236, memory: 737, loss: 2.4767
+2022-07-08 12:09:35,309 - mmcls - INFO - Epoch [30][20/100]	lr: 1.000e-04, eta: 0:02:02, time: 0.074, data_time: 0.002, memory: 737, loss: 2.5506
+2022-07-08 12:09:36,227 - mmcls - INFO - Epoch [30][30/100]	lr: 1.000e-04, eta: 0:02:01, time: 0.092, data_time: 0.003, memory: 737, loss: 2.5530
+2022-07-08 12:09:37,106 - mmcls - INFO - Epoch [30][40/100]	lr: 1.000e-04, eta: 0:02:00, time: 0.088, data_time: 0.001, memory: 737, loss: 2.5468
+2022-07-08 12:09:37,772 - mmcls - INFO - Epoch [30][50/100]	lr: 1.000e-04, eta: 0:01:58, time: 0.065, data_time: 0.006, memory: 737, loss: 2.4032
+2022-07-08 12:09:38,618 - mmcls - INFO - Epoch [30][60/100]	lr: 1.000e-04, eta: 0:01:57, time: 0.085, data_time: 0.024, memory: 737, loss: 2.6369
+2022-07-08 12:09:39,335 - mmcls - INFO - Epoch [30][70/100]	lr: 1.000e-04, eta: 0:01:56, time: 0.072, data_time: 0.005, memory: 737, loss: 2.6934
+2022-07-08 12:09:40,100 - mmcls - INFO - Epoch [30][80/100]	lr: 1.000e-04, eta: 0:01:55, time: 0.077, data_time: 0.019, memory: 737, loss: 2.5592
+2022-07-08 12:09:40,920 - mmcls - INFO - Epoch [30][90/100]	lr: 1.000e-04, eta: 0:01:53, time: 0.081, data_time: 0.015, memory: 737, loss: 2.4827
+2022-07-08 12:09:41,854 - mmcls - INFO - Epoch [30][100/100]	lr: 1.000e-04, eta: 0:01:52, time: 0.094, data_time: 0.013, memory: 737, loss: 2.5546
+2022-07-08 12:09:41,855 - mmcls - INFO - Saving checkpoint at 30 epochs
+2022-07-08 12:09:45,510 - mmcls - INFO - Epoch(val) [30][37]	mAP: 80.5097, ACC: 0.8682
+2022-07-08 12:09:49,049 - mmcls - INFO - Epoch [31][10/100]	lr: 1.000e-04, eta: 0:01:52, time: 0.352, data_time: 0.251, memory: 737, loss: 2.5081
+2022-07-08 12:09:49,786 - mmcls - INFO - Epoch [31][20/100]	lr: 1.000e-04, eta: 0:01:51, time: 0.075, data_time: 0.008, memory: 737, loss: 2.5044
+2022-07-08 12:09:50,519 - mmcls - INFO - Epoch [31][30/100]	lr: 1.000e-04, eta: 0:01:49, time: 0.073, data_time: 0.013, memory: 737, loss: 2.4335
+2022-07-08 12:09:51,434 - mmcls - INFO - Epoch [31][40/100]	lr: 1.000e-04, eta: 0:01:48, time: 0.093, data_time: 0.021, memory: 737, loss: 2.4582
+2022-07-08 12:09:52,253 - mmcls - INFO - Epoch [31][50/100]	lr: 1.000e-04, eta: 0:01:47, time: 0.082, data_time: 0.014, memory: 737, loss: 2.4656
+2022-07-08 12:09:53,102 - mmcls - INFO - Epoch [31][60/100]	lr: 1.000e-04, eta: 0:01:46, time: 0.085, data_time: 0.001, memory: 737, loss: 2.5535
+2022-07-08 12:09:54,065 - mmcls - INFO - Epoch [31][70/100]	lr: 1.000e-04, eta: 0:01:44, time: 0.095, data_time: 0.026, memory: 737, loss: 2.5713
+2022-07-08 12:09:54,864 - mmcls - INFO - Epoch [31][80/100]	lr: 1.000e-04, eta: 0:01:43, time: 0.081, data_time: 0.002, memory: 737, loss: 2.6309
+2022-07-08 12:09:55,650 - mmcls - INFO - Epoch [31][90/100]	lr: 1.000e-04, eta: 0:01:42, time: 0.078, data_time: 0.001, memory: 737, loss: 2.4829
+2022-07-08 12:09:56,299 - mmcls - INFO - Epoch [31][100/100]	lr: 1.000e-04, eta: 0:01:41, time: 0.064, data_time: 0.001, memory: 737, loss: 2.5648
+2022-07-08 12:09:59,743 - mmcls - INFO - Epoch(val) [31][37]	mAP: 80.5227, ACC: 0.8681
+2022-07-08 12:10:03,191 - mmcls - INFO - Epoch [32][10/100]	lr: 1.000e-04, eta: 0:01:40, time: 0.344, data_time: 0.236, memory: 737, loss: 2.4996
+2022-07-08 12:10:04,339 - mmcls - INFO - Epoch [32][20/100]	lr: 1.000e-04, eta: 0:01:39, time: 0.115, data_time: 0.001, memory: 737, loss: 2.5592
+2022-07-08 12:10:05,024 - mmcls - INFO - Epoch [32][30/100]	lr: 1.000e-04, eta: 0:01:38, time: 0.068, data_time: 0.006, memory: 737, loss: 2.5952
+2022-07-08 12:10:05,929 - mmcls - INFO - Epoch [32][40/100]	lr: 1.000e-04, eta: 0:01:37, time: 0.090, data_time: 0.008, memory: 737, loss: 2.4317
+2022-07-08 12:10:06,659 - mmcls - INFO - Epoch [32][50/100]	lr: 1.000e-04, eta: 0:01:35, time: 0.074, data_time: 0.003, memory: 737, loss: 2.4990
+2022-07-08 12:10:07,561 - mmcls - INFO - Epoch [32][60/100]	lr: 1.000e-04, eta: 0:01:34, time: 0.089, data_time: 0.001, memory: 737, loss: 2.5367
+2022-07-08 12:10:08,563 - mmcls - INFO - Epoch [32][70/100]	lr: 1.000e-04, eta: 0:01:33, time: 0.101, data_time: 0.002, memory: 737, loss: 2.6220
+2022-07-08 12:10:09,399 - mmcls - INFO - Epoch [32][80/100]	lr: 1.000e-04, eta: 0:01:32, time: 0.083, data_time: 0.001, memory: 737, loss: 2.4690
+2022-07-08 12:10:10,302 - mmcls - INFO - Epoch [32][90/100]	lr: 1.000e-04, eta: 0:01:31, time: 0.091, data_time: 0.002, memory: 737, loss: 2.3883
+2022-07-08 12:10:11,041 - mmcls - INFO - Epoch [32][100/100]	lr: 1.000e-04, eta: 0:01:30, time: 0.074, data_time: 0.001, memory: 737, loss: 2.6127
+2022-07-08 12:10:14,452 - mmcls - INFO - Epoch(val) [32][37]	mAP: 80.5613, ACC: 0.8683
+2022-07-08 12:10:17,669 - mmcls - INFO - Epoch [33][10/100]	lr: 1.000e-04, eta: 0:01:29, time: 0.320, data_time: 0.252, memory: 737, loss: 2.5336
+2022-07-08 12:10:18,364 - mmcls - INFO - Epoch [33][20/100]	lr: 1.000e-04, eta: 0:01:28, time: 0.069, data_time: 0.002, memory: 737, loss: 2.4724
+2022-07-08 12:10:19,189 - mmcls - INFO - Epoch [33][30/100]	lr: 1.000e-04, eta: 0:01:26, time: 0.083, data_time: 0.002, memory: 737, loss: 2.5037
+2022-07-08 12:10:19,871 - mmcls - INFO - Epoch [33][40/100]	lr: 1.000e-04, eta: 0:01:25, time: 0.069, data_time: 0.002, memory: 737, loss: 2.5128
+2022-07-08 12:10:20,678 - mmcls - INFO - Epoch [33][50/100]	lr: 1.000e-04, eta: 0:01:24, time: 0.080, data_time: 0.000, memory: 737, loss: 2.6203
+2022-07-08 12:10:21,471 - mmcls - INFO - Epoch [33][60/100]	lr: 1.000e-04, eta: 0:01:23, time: 0.080, data_time: 0.019, memory: 737, loss: 2.5574
+2022-07-08 12:10:22,308 - mmcls - INFO - Epoch [33][70/100]	lr: 1.000e-04, eta: 0:01:22, time: 0.084, data_time: 0.024, memory: 737, loss: 2.3508
+2022-07-08 12:10:23,290 - mmcls - INFO - Epoch [33][80/100]	lr: 1.000e-04, eta: 0:01:20, time: 0.097, data_time: 0.001, memory: 737, loss: 2.5477
+2022-07-08 12:10:24,354 - mmcls - INFO - Epoch [33][90/100]	lr: 1.000e-04, eta: 0:01:19, time: 0.107, data_time: 0.011, memory: 737, loss: 2.6814
+2022-07-08 12:10:25,412 - mmcls - INFO - Epoch [33][100/100]	lr: 1.000e-04, eta: 0:01:18, time: 0.106, data_time: 0.010, memory: 737, loss: 2.5041
+2022-07-08 12:10:28,853 - mmcls - INFO - Epoch(val) [33][37]	mAP: 80.5556, ACC: 0.8682
+2022-07-08 12:10:32,074 - mmcls - INFO - Epoch [34][10/100]	lr: 1.000e-04, eta: 0:01:18, time: 0.320, data_time: 0.234, memory: 737, loss: 2.5532
+2022-07-08 12:10:33,242 - mmcls - INFO - Epoch [34][20/100]	lr: 1.000e-04, eta: 0:01:16, time: 0.117, data_time: 0.002, memory: 737, loss: 2.5239
+2022-07-08 12:10:33,952 - mmcls - INFO - Epoch [34][30/100]	lr: 1.000e-04, eta: 0:01:15, time: 0.071, data_time: 0.002, memory: 737, loss: 2.6306
+2022-07-08 12:10:34,844 - mmcls - INFO - Epoch [34][40/100]	lr: 1.000e-04, eta: 0:01:14, time: 0.089, data_time: 0.002, memory: 737, loss: 2.4797
+2022-07-08 12:10:35,892 - mmcls - INFO - Epoch [34][50/100]	lr: 1.000e-04, eta: 0:01:13, time: 0.105, data_time: 0.002, memory: 737, loss: 2.5111
+2022-07-08 12:10:36,508 - mmcls - INFO - Epoch [34][60/100]	lr: 1.000e-04, eta: 0:01:12, time: 0.062, data_time: 0.002, memory: 737, loss: 2.5146
+2022-07-08 12:10:37,400 - mmcls - INFO - Epoch [34][70/100]	lr: 1.000e-04, eta: 0:01:10, time: 0.090, data_time: 0.001, memory: 737, loss: 2.5469
+2022-07-08 12:10:38,316 - mmcls - INFO - Epoch [34][80/100]	lr: 1.000e-04, eta: 0:01:09, time: 0.091, data_time: 0.001, memory: 737, loss: 2.4428
+2022-07-08 12:10:39,041 - mmcls - INFO - Epoch [34][90/100]	lr: 1.000e-04, eta: 0:01:08, time: 0.072, data_time: 0.001, memory: 737, loss: 2.3833
+2022-07-08 12:10:39,866 - mmcls - INFO - Epoch [34][100/100]	lr: 1.000e-04, eta: 0:01:07, time: 0.083, data_time: 0.019, memory: 737, loss: 2.5095
+2022-07-08 12:10:43,348 - mmcls - INFO - Epoch(val) [34][37]	mAP: 80.5956, ACC: 0.8679
+2022-07-08 12:10:46,520 - mmcls - INFO - Epoch [35][10/100]	lr: 1.000e-04, eta: 0:01:06, time: 0.316, data_time: 0.225, memory: 737, loss: 2.4783
+2022-07-08 12:10:47,258 - mmcls - INFO - Epoch [35][20/100]	lr: 1.000e-04, eta: 0:01:05, time: 0.075, data_time: 0.012, memory: 737, loss: 2.3386
+2022-07-08 12:10:48,195 - mmcls - INFO - Epoch [35][30/100]	lr: 1.000e-04, eta: 0:01:04, time: 0.093, data_time: 0.017, memory: 737, loss: 2.4331
+2022-07-08 12:10:49,108 - mmcls - INFO - Epoch [35][40/100]	lr: 1.000e-04, eta: 0:01:03, time: 0.091, data_time: 0.036, memory: 737, loss: 2.5601
+2022-07-08 12:10:50,103 - mmcls - INFO - Epoch [35][50/100]	lr: 1.000e-04, eta: 0:01:01, time: 0.101, data_time: 0.044, memory: 737, loss: 2.4798
+2022-07-08 12:10:51,056 - mmcls - INFO - Epoch [35][60/100]	lr: 1.000e-04, eta: 0:01:00, time: 0.094, data_time: 0.036, memory: 737, loss: 2.4520
+2022-07-08 12:10:51,855 - mmcls - INFO - Epoch [35][70/100]	lr: 1.000e-04, eta: 0:00:59, time: 0.080, data_time: 0.012, memory: 737, loss: 2.5591
+2022-07-08 12:10:52,812 - mmcls - INFO - Epoch [35][80/100]	lr: 1.000e-04, eta: 0:00:58, time: 0.097, data_time: 0.032, memory: 737, loss: 2.6029
+2022-07-08 12:10:53,781 - mmcls - INFO - Epoch [35][90/100]	lr: 1.000e-04, eta: 0:00:57, time: 0.096, data_time: 0.001, memory: 737, loss: 2.5206
+2022-07-08 12:10:54,627 - mmcls - INFO - Epoch [35][100/100]	lr: 1.000e-04, eta: 0:00:56, time: 0.085, data_time: 0.001, memory: 737, loss: 2.3991
+2022-07-08 12:10:58,016 - mmcls - INFO - Epoch(val) [35][37]	mAP: 80.6136, ACC: 0.8683
+2022-07-08 12:11:01,673 - mmcls - INFO - Epoch [36][10/100]	lr: 1.000e-04, eta: 0:00:55, time: 0.365, data_time: 0.305, memory: 737, loss: 2.4016
+2022-07-08 12:11:02,468 - mmcls - INFO - Epoch [36][20/100]	lr: 1.000e-04, eta: 0:00:54, time: 0.079, data_time: 0.015, memory: 737, loss: 2.6187
+2022-07-08 12:11:03,339 - mmcls - INFO - Epoch [36][30/100]	lr: 1.000e-04, eta: 0:00:53, time: 0.088, data_time: 0.019, memory: 737, loss: 2.4931
+2022-07-08 12:11:04,242 - mmcls - INFO - Epoch [36][40/100]	lr: 1.000e-04, eta: 0:00:51, time: 0.090, data_time: 0.008, memory: 737, loss: 2.5121
+2022-07-08 12:11:05,030 - mmcls - INFO - Epoch [36][50/100]	lr: 1.000e-04, eta: 0:00:50, time: 0.078, data_time: 0.002, memory: 737, loss: 2.5365
+2022-07-08 12:11:05,865 - mmcls - INFO - Epoch [36][60/100]	lr: 1.000e-04, eta: 0:00:49, time: 0.084, data_time: 0.018, memory: 737, loss: 2.4733
+2022-07-08 12:11:06,495 - mmcls - INFO - Epoch [36][70/100]	lr: 1.000e-04, eta: 0:00:48, time: 0.062, data_time: 0.001, memory: 737, loss: 2.4209
+2022-07-08 12:11:07,385 - mmcls - INFO - Epoch [36][80/100]	lr: 1.000e-04, eta: 0:00:47, time: 0.090, data_time: 0.013, memory: 737, loss: 2.6066
+2022-07-08 12:11:08,201 - mmcls - INFO - Epoch [36][90/100]	lr: 1.000e-04, eta: 0:00:46, time: 0.082, data_time: 0.012, memory: 737, loss: 2.3535
+2022-07-08 12:11:08,927 - mmcls - INFO - Epoch [36][100/100]	lr: 1.000e-04, eta: 0:00:44, time: 0.072, data_time: 0.001, memory: 737, loss: 2.5474
+2022-07-08 12:11:12,454 - mmcls - INFO - Epoch(val) [36][37]	mAP: 80.6830, ACC: 0.8683
+2022-07-08 12:11:16,070 - mmcls - INFO - Epoch [37][10/100]	lr: 1.000e-04, eta: 0:00:44, time: 0.360, data_time: 0.251, memory: 737, loss: 2.5820
+2022-07-08 12:11:16,914 - mmcls - INFO - Epoch [37][20/100]	lr: 1.000e-04, eta: 0:00:42, time: 0.084, data_time: 0.002, memory: 737, loss: 2.4284
+2022-07-08 12:11:17,749 - mmcls - INFO - Epoch [37][30/100]	lr: 1.000e-04, eta: 0:00:41, time: 0.084, data_time: 0.008, memory: 737, loss: 2.4529
+2022-07-08 12:11:18,722 - mmcls - INFO - Epoch [37][40/100]	lr: 1.000e-04, eta: 0:00:40, time: 0.098, data_time: 0.005, memory: 737, loss: 2.4997
+2022-07-08 12:11:19,453 - mmcls - INFO - Epoch [37][50/100]	lr: 1.000e-04, eta: 0:00:39, time: 0.073, data_time: 0.001, memory: 737, loss: 2.4261
+2022-07-08 12:11:20,505 - mmcls - INFO - Epoch [37][60/100]	lr: 1.000e-04, eta: 0:00:38, time: 0.106, data_time: 0.001, memory: 737, loss: 2.4900
+2022-07-08 12:11:21,274 - mmcls - INFO - Epoch [37][70/100]	lr: 1.000e-04, eta: 0:00:37, time: 0.077, data_time: 0.001, memory: 737, loss: 2.6014
+2022-07-08 12:11:21,982 - mmcls - INFO - Epoch [37][80/100]	lr: 1.000e-04, eta: 0:00:35, time: 0.071, data_time: 0.001, memory: 737, loss: 2.5402
+2022-07-08 12:11:22,834 - mmcls - INFO - Epoch [37][90/100]	lr: 1.000e-04, eta: 0:00:34, time: 0.085, data_time: 0.001, memory: 737, loss: 2.5126
+2022-07-08 12:11:23,659 - mmcls - INFO - Epoch [37][100/100]	lr: 1.000e-04, eta: 0:00:33, time: 0.083, data_time: 0.002, memory: 737, loss: 2.4982
+2022-07-08 12:11:27,039 - mmcls - INFO - Epoch(val) [37][37]	mAP: 80.6854, ACC: 0.8682
+2022-07-08 12:11:30,246 - mmcls - INFO - Epoch [38][10/100]	lr: 1.000e-04, eta: 0:00:32, time: 0.320, data_time: 0.247, memory: 737, loss: 2.5430
+2022-07-08 12:11:30,995 - mmcls - INFO - Epoch [38][20/100]	lr: 1.000e-04, eta: 0:00:31, time: 0.075, data_time: 0.015, memory: 737, loss: 2.6704
+2022-07-08 12:11:31,923 - mmcls - INFO - Epoch [38][30/100]	lr: 1.000e-04, eta: 0:00:30, time: 0.093, data_time: 0.015, memory: 737, loss: 2.4996
+2022-07-08 12:11:32,777 - mmcls - INFO - Epoch [38][40/100]	lr: 1.000e-04, eta: 0:00:29, time: 0.086, data_time: 0.018, memory: 737, loss: 2.4738
+2022-07-08 12:11:33,624 - mmcls - INFO - Epoch [38][50/100]	lr: 1.000e-04, eta: 0:00:28, time: 0.084, data_time: 0.007, memory: 737, loss: 2.4510
+2022-07-08 12:11:34,393 - mmcls - INFO - Epoch [38][60/100]	lr: 1.000e-04, eta: 0:00:26, time: 0.077, data_time: 0.019, memory: 737, loss: 2.4814
+2022-07-08 12:11:35,415 - mmcls - INFO - Epoch [38][70/100]	lr: 1.000e-04, eta: 0:00:25, time: 0.103, data_time: 0.040, memory: 737, loss: 2.5261
+2022-07-08 12:11:36,031 - mmcls - INFO - Epoch [38][80/100]	lr: 1.000e-04, eta: 0:00:24, time: 0.061, data_time: 0.002, memory: 737, loss: 2.4676
+2022-07-08 12:11:36,887 - mmcls - INFO - Epoch [38][90/100]	lr: 1.000e-04, eta: 0:00:23, time: 0.087, data_time: 0.002, memory: 737, loss: 2.5239
+2022-07-08 12:11:37,624 - mmcls - INFO - Epoch [38][100/100]	lr: 1.000e-04, eta: 0:00:22, time: 0.073, data_time: 0.005, memory: 737, loss: 2.4813
+2022-07-08 12:11:41,084 - mmcls - INFO - Epoch(val) [38][37]	mAP: 80.7308, ACC: 0.8683
+2022-07-08 12:11:44,461 - mmcls - INFO - Epoch [39][10/100]	lr: 1.000e-04, eta: 0:00:21, time: 0.336, data_time: 0.218, memory: 737, loss: 2.4387
+2022-07-08 12:11:45,273 - mmcls - INFO - Epoch [39][20/100]	lr: 1.000e-04, eta: 0:00:20, time: 0.081, data_time: 0.002, memory: 737, loss: 2.4922
+2022-07-08 12:11:46,026 - mmcls - INFO - Epoch [39][30/100]	lr: 1.000e-04, eta: 0:00:19, time: 0.076, data_time: 0.001, memory: 737, loss: 2.4483
+2022-07-08 12:11:46,650 - mmcls - INFO - Epoch [39][40/100]	lr: 1.000e-04, eta: 0:00:17, time: 0.062, data_time: 0.001, memory: 737, loss: 2.5468
+2022-07-08 12:11:47,562 - mmcls - INFO - Epoch [39][50/100]	lr: 1.000e-04, eta: 0:00:16, time: 0.091, data_time: 0.004, memory: 737, loss: 2.5165
+2022-07-08 12:11:48,363 - mmcls - INFO - Epoch [39][60/100]	lr: 1.000e-04, eta: 0:00:15, time: 0.079, data_time: 0.001, memory: 737, loss: 2.5412
+2022-07-08 12:11:49,408 - mmcls - INFO - Epoch [39][70/100]	lr: 1.000e-04, eta: 0:00:14, time: 0.105, data_time: 0.002, memory: 737, loss: 2.3529
+2022-07-08 12:11:50,166 - mmcls - INFO - Epoch [39][80/100]	lr: 1.000e-04, eta: 0:00:13, time: 0.075, data_time: 0.001, memory: 737, loss: 2.4604
+2022-07-08 12:11:51,019 - mmcls - INFO - Epoch [39][90/100]	lr: 1.000e-04, eta: 0:00:12, time: 0.086, data_time: 0.002, memory: 737, loss: 2.4889
+2022-07-08 12:11:51,842 - mmcls - INFO - Epoch [39][100/100]	lr: 1.000e-04, eta: 0:00:11, time: 0.082, data_time: 0.006, memory: 737, loss: 2.5543
+2022-07-08 12:11:55,317 - mmcls - INFO - Epoch(val) [39][37]	mAP: 80.8044, ACC: 0.8687
+2022-07-08 12:11:58,454 - mmcls - INFO - Epoch [40][10/100]	lr: 1.000e-04, eta: 0:00:10, time: 0.313, data_time: 0.239, memory: 737, loss: 2.5477
+2022-07-08 12:11:59,310 - mmcls - INFO - Epoch [40][20/100]	lr: 1.000e-04, eta: 0:00:08, time: 0.086, data_time: 0.005, memory: 737, loss: 2.5368
+2022-07-08 12:12:00,052 - mmcls - INFO - Epoch [40][30/100]	lr: 1.000e-04, eta: 0:00:07, time: 0.074, data_time: 0.004, memory: 737, loss: 2.5343
+2022-07-08 12:12:01,074 - mmcls - INFO - Epoch [40][40/100]	lr: 1.000e-04, eta: 0:00:06, time: 0.102, data_time: 0.006, memory: 737, loss: 2.4753
+2022-07-08 12:12:01,766 - mmcls - INFO - Epoch [40][50/100]	lr: 1.000e-04, eta: 0:00:05, time: 0.070, data_time: 0.002, memory: 737, loss: 2.4989
+2022-07-08 12:12:02,921 - mmcls - INFO - Epoch [40][60/100]	lr: 1.000e-04, eta: 0:00:04, time: 0.115, data_time: 0.001, memory: 737, loss: 2.5613
+2022-07-08 12:12:04,066 - mmcls - INFO - Epoch [40][70/100]	lr: 1.000e-04, eta: 0:00:03, time: 0.114, data_time: 0.055, memory: 737, loss: 2.5443
+2022-07-08 12:12:04,793 - mmcls - INFO - Epoch [40][80/100]	lr: 1.000e-04, eta: 0:00:02, time: 0.073, data_time: 0.015, memory: 737, loss: 2.4168
+2022-07-08 12:12:05,564 - mmcls - INFO - Epoch [40][90/100]	lr: 1.000e-04, eta: 0:00:01, time: 0.077, data_time: 0.001, memory: 737, loss: 2.5087
+2022-07-08 12:12:06,771 - mmcls - INFO - Epoch [40][100/100]	lr: 1.000e-04, eta: 0:00:00, time: 0.121, data_time: 0.068, memory: 737, loss: 2.4212
+2022-07-08 12:12:06,772 - mmcls - INFO - Saving checkpoint at 40 epochs
+2022-07-08 12:12:10,748 - mmcls - INFO - Epoch(val) [40][37]	mAP: 80.7312, ACC: 0.8678
