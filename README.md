@@ -1,7 +1,10 @@
 # ProHealth REU 2022 - PlateInsight
 ![Poster SIze (4)](https://user-images.githubusercontent.com/30844989/181936264-f66894e4-d943-4ec3-9a9e-9c6a623fb1e5.png)
+#Abstract
+We consider how to improve dietary analysis from its popular style of manual logging to an automatic photo method using lightweight CNNs, which will lead to better personal diet review and communication with health professionals. Previous work in computer vision food analysis focus on calorie estimation and specific dish recognition, which by themselves are insufficient for assessing nutrition intake and general eating habits. We present a new holistic approach for automated food analysis using food texture and food group recognition to extract more meaningful dietary insights. Images from three existing datasets: FoodSeg103, Nutrition5K, and AICrowd Food Recognition V2.1, were taken and relabeled by 7 widely-used food textures to create a multi-label texture dataset with 8750 images and 10 major food groups to create a segmented food group dataset with 7160 images. MobileNetV3L was fine-tuned to perform multi-label classification on both datasets with promising preliminary accuracies. DeepLabV3+ with a MobileNetV3L backbone was also used to generate semantic segmentation masks for rough portion estimation. Lastly, we combine the food group multi-label classifier and the segmentation model on a single multi-task network, resulting in moderate performance boosts in both tasks. Our results validate the feasibility of food texture and food group recognition using a lightweight CNN architecture and supports the use of multi-task modeling for food computer vision. We hope our holistic dietary assessment pipeline encourages additional future work in developing more nutritionally-relevant and insightful computer vision food analysis systems.
+Preprint: https://drive.google.com/file/d/1FrRjbLpCf725dxuZFuP_hiysjjhBC8nO/view?usp=sharing
 
-Sample Segmentation Inferences:
+#Sample Segmentation Inferences:
 ![5](https://user-images.githubusercontent.com/30844989/182004771-9fa7eeb7-43c4-4e33-8918-a971d9b9bb41.png)
 ![4](https://user-images.githubusercontent.com/30844989/182004776-94cbad20-e400-451d-9545-0889f71660cd.png)
 ![1](https://user-images.githubusercontent.com/30844989/182004785-8910dfca-3fb6-42f9-a716-d55bd6e439ea.png)
